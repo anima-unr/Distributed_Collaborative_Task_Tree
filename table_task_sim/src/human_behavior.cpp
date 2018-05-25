@@ -103,6 +103,8 @@ void HumanBehavior::UpdateActivationPotential() {
 
   // ROS_DEBUG_NAMED("HumanBehavior", "%s: activation_potential: [%f]", object_.c_str(), state_.activation_potential );
 
+  state_.activation_potential = obj_chance_; //TODO check order of magnitude
+
 
 
 }
@@ -110,7 +112,14 @@ void HumanBehavior::UpdateActivationPotential() {
 
 bool HumanBehavior::Precondition() {
     // ROS_INFO("AndBehavior::Precondition was called!!!!\n");
-  return true;
+  // return true;
+
+  if( obj_check_ == 1) {
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 uint32_t HumanBehavior::SpreadActivation() {
@@ -124,54 +133,59 @@ uint32_t HumanBehavior::SpreadActivation() {
 void HumanBehavior::Work() {
   ROS_INFO("HumanBehavior::Work: waiting for pause to be done!");
   // boost::this_thread::sleep(boost::posix_time::millisec(10000));
-  PickAndPlace(object_, robot_des_);
-    // while (!PickAndPlaceDone()) {
-      //boost::this_thread::sleep(boost::posix_time::millisec(500));
-        // ROS_INFO("TableObject::Work: waiting for pick and place to be done!");
-    // }
+  // PickAndPlace(object_, robot_des_);
+  //   // while (!PickAndPlaceDone()) {
+  //     //boost::this_thread::sleep(boost::posix_time::millisec(500));
+  //       // ROS_INFO("TableObject::Work: waiting for pick and place to be done!");
+  //   // }
   mut_arm.Release();
+
+  while(obj_check_ == 0){
+    continue;
+  }
+  state_.done = true;
   ROS_INFO("[%s]: HumanBehavior::Work: Done!", name_->topic.c_str());
   //ROS_INFO("\t[%s]: HumanBehavior::MUTEX IS RELEASED!", name_->topic.c_str());
 }
 
-void HumanBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
+// void HumanBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
 
-  // pick
-  table_task_sim::PickUpObject req_pick;
-  req_pick.request.robot_id = (int)robot_des;
-  req_pick.request.object_name = object;
-  // table_task_sim::PickUpObject::Response res_pick; //to know if it failed or not...
+//   // pick
+//   table_task_sim::PickUpObject req_pick;
+//   req_pick.request.robot_id = (int)robot_des;
+//   req_pick.request.object_name = object;
+//   // table_task_sim::PickUpObject::Response res_pick; //to know if it failed or not...
 
-  // place
-  geometry_msgs::Pose pose;
-  pose.position.x = -0.45;
-  pose.position.y = 0.0;
-  pose.position.z = 0;
-  pose.orientation.x = 0;
-  pose.orientation.y = 0;
-  pose.orientation.z = 0;
-  pose.orientation.w = 1;
+//   // place
+//   geometry_msgs::Pose pose;
+//   pose.position.x = -0.45;
+//   pose.position.y = 0.0;
+//   pose.position.z = 0;
+//   pose.orientation.x = 0;
+//   pose.orientation.y = 0;
+//   pose.orientation.z = 0;
+//   pose.orientation.w = 1;
 
-  table_task_sim::PlaceObject req_place;
-  req_place.request.robot_id = (int)robot_des;
-  req_place.request.goal = pose;
-  // table_task_sim::PlaceObject::Response res_place; //to know if it failed or not...
+//   table_task_sim::PlaceObject req_place;
+//   req_place.request.robot_id = (int)robot_des;
+//   req_place.request.goal = pose;
+//   // table_task_sim::PlaceObject::Response res_place; //to know if it failed or not...
 
-  // call the pick service
-  if(ros::service::call("pick_service", req_pick)) {
+//   // call the pick service
+//   if(ros::service::call("pick_service", req_pick)) {
 
-    ROS_INFO("\t\t[%s]: THE PICK SERVICE WAS CALLED!!", name_->topic.c_str());
+//     ROS_INFO("\t\t[%s]: THE PICK SERVICE WAS CALLED!!", name_->topic.c_str());
 
-    // call the place service
-    if(ros::service::call("place_service", req_place)) {
-      ROS_INFO("\t\t[%s]: THE PLACE SERVICE WAS CALLED!!", name_->topic.c_str());
-    }
-  }
+//     // call the place service
+//     if(ros::service::call("place_service", req_place)) {
+//       ROS_INFO("\t\t[%s]: THE PLACE SERVICE WAS CALLED!!", name_->topic.c_str());
+//     }
+//   }
 
-  state_.done = true;
-  ROS_INFO( "[%s]: PickAndPlace: everything is done", name_->topic.c_str() );
+//   state_.done = true;
+//   ROS_INFO( "[%s]: PickAndPlace: everything is done", name_->topic.c_str() );
 
-}
+// }
 
 bool HumanBehavior::PickAndPlaceDone() {
   // table_setting_demo::pick_and_place msg;
@@ -227,3 +241,5 @@ bool HumanBehavior::ActivationPrecondition() {
   }
 
 }  // namespace task_net
+
+
