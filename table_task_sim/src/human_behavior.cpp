@@ -1,7 +1,8 @@
 #include <geometry_msgs/Pose.h>
 #include <table_task_sim/PickUpObject.h>
 #include <table_task_sim/PlaceObject.h>
-#include <table_task_sim/Human_behavior.h>
+#include <table_task_sim/ObjStatus.h>
+#include <table_task_sim/human_behavior.h>
 
 namespace task_net {
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,9 +33,10 @@ HumanBehavior::HumanBehavior(NodeId_t name, NodeList peers, NodeList children,
     state_sub_ = local_.subscribe("/state", 1000, &HumanBehavior::StateCallback, this );
 
     // subscribe to object status messages from Bashira's work
-    std::string topic;
-    sprintf(topic.c_str(), "/%s_status", object_.c_str());
-    obj_status_sub_ = local_.subscribe("", 1000, &HumanBehavior::ObjStatusCallback, this );
+    //char topic[];
+    std::string topic = std::string("/") + object + std::string( "_status");
+    //sprintf(topic, "/%s_status", object_.c_str());
+    obj_status_sub_ = local_.subscribe(topic.c_str(), 1000, &HumanBehavior::ObjStatusCallback, this );
 }
 HumanBehavior::~HumanBehavior() {}
 

@@ -1,7 +1,7 @@
 <launch>
 	<!-- load the simulator node -->
 	<node name="table_sim" pkg="table_task_sim" type="table_task_sim_node">
-    	<param name="filename" value="$(find table_task_sim)/config/teatime_setup.yaml" />
+    	<param name="filename" value="$(find table_task_sim)/config/DARS_setup.yaml" />
 	</node>
 
 	<!-- load rviz configured for the task -->

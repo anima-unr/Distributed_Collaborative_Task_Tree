@@ -15,13 +15,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef Human_BEHAVIOR_H_
-#define Human_BEHAVIOR_H_
+#ifndef HUMAN_BEHAVIOR_H_
+#define HUMAN_BEHAVIOR_H_
 
 #include "robotics_task_tree_eval/behavior.h"
 #include "remote_mutex/remote_mutex.h"
 
 #include <table_task_sim/SimState.h>
+#include <table_task_sim/ObjStatus.h>
 
 namespace task_net {
 	class HumanBehavior: public Behavior {
@@ -41,6 +42,7 @@ namespace task_net {
 	  bool PickAndPlaceDone();
 	  void Work();
 	  void StateCallback( table_task_sim::SimState msg);
+	  void ObjStatusCallback( table_task_sim::ObjStatus msg);
 
 	  double obj_chance_;
 	  bool obj_check_;
