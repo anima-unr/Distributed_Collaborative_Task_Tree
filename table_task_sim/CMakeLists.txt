@@ -185,6 +185,7 @@ include_directories(
   add_executable(human_multi_demo
     src/human_multi_network.cc
     src/human_behavior.cpp
+    src/dummy_behavior.cc
   )
 
   add_dependencies(human_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

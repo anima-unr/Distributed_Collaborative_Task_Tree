@@ -171,21 +171,21 @@ int main(int argc, char *argv[]) {
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
             // set up network for corresponding node:
 
-            // // if robot is PR2, use dummy behavior
-            // if( robot_des == PR2 ) {
+            // if robot is PR2, use dummy behavior
+            if( robot_des == PR2 ) {
 
-            //   network[i] = new task_net::DummyBehavior(name_param,
-            //                             peers_param,
-            //                             children_param,
-            //                             parent_param,
-            //                             state,
-            //                             obj_name,
-            //                             robot_des,
-            //                             false);
-            // }
+              network[i] = new task_net::DummyBehavior(name_param,
+                                        peers_param,
+                                        children_param,
+                                        parent_param,
+                                        state,
+                                        obj_name,
+                                        robot_des,
+                                        false);
+            }
 
             // // if robot is BAXTER, use human behavior 
-            // else{ 
+            else{ 
               network[i] = new task_net::HumanBehavior(name_param,
                                         peers_param,
                                         children_param,
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
                                         obj_name,
                                         robot_des,
                                         false);
-              // }
+              }
             // printf("\ttask_net::PLACE %d\n",task_net::PLACE);
             break;
           case task_net::ROOT:
