@@ -50,12 +50,11 @@ endif()
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  ObjStatus.msg
+)
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -244,6 +243,21 @@ if (${BUILD_TABLE_SETTING_DEMO})
   )
   add_dependencies(multi_robot_demo_visionManip
     multi_robot_demo_visionManip_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+  )
+
+
+# human multi vision manip
+  add_executable(human_multi_demo_visionManip
+    src/human_multi_demo_visionManip.cpp
+    src/human_behavior.cpp
+    src/table_object_behavior_VisionManip.cpp
+  )
+
+  add_dependencies(human_multi_demo_visionManip ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+  target_link_libraries(human_multi_demo_visionManip
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
   )
 
 
