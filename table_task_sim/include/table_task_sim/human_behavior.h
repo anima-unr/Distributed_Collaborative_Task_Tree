@@ -45,7 +45,8 @@ namespace task_net {
 	  void ObjStatusCallback( table_task_sim::ObjStatus msg);
 
 	  double obj_chance_;
-	  bool obj_check_;
+	  bool obj_started_;
+	  bool obj_done_;
 
 	 protected:
 	  virtual bool Precondition();

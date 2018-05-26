@@ -105,7 +105,7 @@ Nodes:
       robot: 1
       node: 9
     parent: 'NONE'
-    children: ['THEN_1_0_010']
+    children: ['THEN_0_1_010']
     peers: ['ROOT_4_0_000']
   THEN_0_1_010:
     mask:
@@ -120,7 +120,7 @@ Nodes:
       type: 2
       robot: 1
       node: 11
-    parent: THEN_1_1_001
+    parent: THEN_0_1_010
     children: ['PLACE_3_1_012', 'PLACE_3_1_013', 'PLACE_3_1_014']
     peers: ['AND_2_0_002']
   PLACE_3_1_012:
@@ -155,7 +155,7 @@ Nodes:
       type: 1
       robot: 1Z
       node: 15
-    parent: THEN_1_0_010
+    parent: THEN_0_1_010
     children: ['PLACE_3_1_016', 'PLACE_3_1_017']
     peers: ['OR_1_0_006']
   PLACE_3_1_016:

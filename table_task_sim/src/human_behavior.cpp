@@ -29,6 +29,7 @@ HumanBehavior::HumanBehavior(NodeId_t name, NodeList peers, NodeList children,
     ROS_INFO( "HumanBehavior: [%s] Object: [%s]", name_->topic.c_str(), object_.c_str() );
     robot_des_ = robot_des;
 
+  // TODO: Remove for Bashira's
     // subscribe to simulator state messages
     state_sub_ = local_.subscribe("/state", 1000, &HumanBehavior::StateCallback, this );
 
@@ -103,9 +104,8 @@ void HumanBehavior::UpdateActivationPotential() {
   //     state_.activation_potential = ( c1 * (1.0f / dist)) + (c2 * state_.suitability);
   // else state_.activation_potential = 0.00000001;
 
-  // ROS_DEBUG_NAMED("HumanBehavior", "%s: activation_potential: [%f]", object_.c_str(), state_.activation_potential );
-
   state_.activation_potential = obj_chance_; //TODO check order of magnitude
+  ROS_WARN_NAMED("HumanBehavior", "%s: activation_potential: [%f]", object_.c_str(), state_.activation_potential );
 
 
 
@@ -116,7 +116,7 @@ bool HumanBehavior::Precondition() {
     // ROS_INFO("AndBehavior::Precondition was called!!!!\n");
   // return true;
 
-  if( obj_check_ == 1) {
+  if( obj_started_ == 1) {
     return true;
   }
   else{
@@ -140,11 +140,14 @@ void HumanBehavior::Work() {
   //     //boost::this_thread::sleep(boost::posix_time::millisec(500));
   //       // ROS_INFO("TableObject::Work: waiting for pick and place to be done!");
   //   // }
-  mut_arm.Release();
+  // mut_arm.Release();
 
-  while(obj_check_ == 0){
+  while(obj_done_ == 0){
+  ROS_WARN("[%s]: HumanBehavior::Working!", name_->topic.c_str());
+
     continue;
   }
+  mut_arm.Release();
   state_.done = true;
   ROS_INFO("[%s]: HumanBehavior::Work: Done!", name_->topic.c_str());
   //ROS_INFO("\t[%s]: HumanBehavior::MUTEX IS RELEASED!", name_->topic.c_str());
@@ -229,6 +232,7 @@ bool HumanBehavior::ActivationPrecondition() {
   return lock_okay;
 }
 
+  // TODO: Remove for Bashira's
   void HumanBehavior::StateCallback( table_task_sim::SimState msg)
   {
     table_state_ = msg;
@@ -238,7 +242,8 @@ bool HumanBehavior::ActivationPrecondition() {
   {
     // table_state_ = msg;
     obj_chance_ = msg.chance;
-    obj_check_ = msg.check;
+    obj_started_ = msg.started;
+    obj_done_ = msg.done;
 
   }
 

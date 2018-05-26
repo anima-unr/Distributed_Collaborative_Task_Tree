@@ -170,32 +170,22 @@ int main(int argc, char *argv[]) {
            // get the name of the object of corresponding node:
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
             // set up network for corresponding node:
-            // ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
-            // network[i] = new task_net::TableObject(name_param,
-            //                           peers_param,
-            //                           children_param,
-            //                           parent_param,
-            //                           state,
-            //                           "/right_arm_mutex",
-            //                           obj_name.c_str(),
-            //                           neutral_object_pos,
-            //                           object_pos,
-            //                           false);
-            // if robot is PR2, use dummy behavior
-            if( robot_des = PR2 ) {
 
-              network[i] = new task_net::DummyBehavior(name_param,
-                                        peers_param,
-                                        children_param,
-                                        parent_param,
-                                        state,
-                                        obj_name,
-                                        robot_des,
-                                        false);
-            }
-            
-            // if robot is BAXTER, use human behavior 
-            else{ 
+            // // if robot is PR2, use dummy behavior
+            // if( robot_des == PR2 ) {
+
+            //   network[i] = new task_net::DummyBehavior(name_param,
+            //                             peers_param,
+            //                             children_param,
+            //                             parent_param,
+            //                             state,
+            //                             obj_name,
+            //                             robot_des,
+            //                             false);
+            // }
+
+            // // if robot is BAXTER, use human behavior 
+            // else{ 
               network[i] = new task_net::HumanBehavior(name_param,
                                         peers_param,
                                         children_param,
@@ -204,7 +194,7 @@ int main(int argc, char *argv[]) {
                                         obj_name,
                                         robot_des,
                                         false);
-              }
+              // }
             // printf("\ttask_net::PLACE %d\n",task_net::PLACE);
             break;
           case task_net::ROOT:

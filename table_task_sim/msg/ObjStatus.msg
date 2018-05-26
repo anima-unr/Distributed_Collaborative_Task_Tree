@@ -1,2 +1,3 @@
 int64 chance
-bool check
+bool started
+bool done
