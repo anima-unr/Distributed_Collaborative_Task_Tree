@@ -7,28 +7,18 @@ Instructions to test the human "robot" brain in the architecture:
 To test that the task allocation architecture is working for the human motions, run the following:
 #-----------
 
-Terminal 1:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
-  roscore -p 1234
-
-Terminal 2:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
-  roslaunch table_task_sim table_task_sim.launch
-
 Terminal 3:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
-  roslaunch table_task_sim human_multi_demo_baxter.launch
+  roslaunch table_setting_demo human_multi_demo_baxter_visionManip.launch 
+
 
 Terminal 4:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
-  roslaunch unr_object_manipulation peer_connection_baxter.launch
+  roslaunch unr_object_manipulation peer_connection_human_baxter_visionManip.launch 
+
 
 Terminal 5:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
-  roslaunch remote_mutex table_setting_mutex_baxter.launch
+   roslaunch remote_mutex table_setting_mutex_baxter.launch
 
 Terminal 6:
-  source devel/setup.bash; export ROS_MASTER_URI=http://localhost:1234;
   rostopic pub /THEN_0_1_010_parent robotics_task_tree_msgs/ControlMesge "sender: {type: 0, robot: 0, node: 0}
     type: 0
     activation_level: 1000000000000.0

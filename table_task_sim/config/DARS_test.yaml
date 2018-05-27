@@ -94,7 +94,7 @@ Nodes:
     parent: OR_1_0_006
     children: ['NONE']
     peers: ['PLACE_3_1_017']
-    object: sports_ball
+    object: apple
 
 # ---------------------------------------------
 
@@ -175,5 +175,5 @@ Nodes:
     parent: OR_1_1_015
     children: ['NONE']
     peers: ['PLACE_3_0_008']
-    object: sports_ball
+    object: apple
 

@@ -79,14 +79,14 @@ static const char *static_object_str[] = {
   // "Meat",
   // "Lettuce"
   // DARS DEMO
-  "teddy_bear",
-  "orange",
-  "sports_ball",
+  "bird",
+  // "orange",
+  "apple",
   "clock",
-  "bottle",
+  // "bottle",
   "scissors",
   "cup",
-  "bowl",
+  // "bowl",
 };
 
 TableObject_VisionManip::TableObject_VisionManip() : arm_group_{"right_arm"} {  ROS_ERROR("START OF TableObject_VisionManip CONSTRUCTOR");}

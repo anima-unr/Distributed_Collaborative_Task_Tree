@@ -59,7 +59,7 @@ Nodes:
     parent: AND_2_0_002
     children: ['NONE']
     peers: ['PLACE_3_1_013']
-    object: teddy_bear
+    object: bird
   PLACE_3_0_005:
     mask:
       type: 5
@@ -94,7 +94,7 @@ Nodes:
     parent: OR_1_0_006
     children: ['NONE']
     peers: ['PLACE_3_1_017']
-    object: sports_ball
+    object: apple
 
 # ---------------------------------------------
 
@@ -140,7 +140,7 @@ Nodes:
     parent: AND_2_1_011
     children: ['NONE']
     peers: ['PLACE_3_0_004']
-    object: teddy_bear
+    object: bird
   PLACE_3_1_014:
     mask:
       type: 5
@@ -175,5 +175,5 @@ Nodes:
     parent: OR_1_1_015
     children: ['NONE']
     peers: ['PLACE_3_0_008']
-    object: sports_ball
+    object: apple
 
