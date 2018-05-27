@@ -1,7 +1,7 @@
 #include <geometry_msgs/Pose.h>
 #include <table_task_sim/PickUpObject.h>
 #include <table_task_sim/PlaceObject.h>
-#include <table_task_sim/ObjStatus.h>
+#include <robotics_task_tree_msgs/ObjStatus.h>
 #include <table_task_sim/human_behavior.h>
 
 namespace task_net {
@@ -238,7 +238,7 @@ bool HumanBehavior::ActivationPrecondition() {
     table_state_ = msg;
   }
 
-  void HumanBehavior::ObjStatusCallback( table_task_sim::ObjStatus msg)
+  void HumanBehavior::ObjStatusCallback( robotics_task_tree_msgs::ObjStatus msg)
   {
     // table_state_ = msg;
     obj_chance_ = msg.chance;

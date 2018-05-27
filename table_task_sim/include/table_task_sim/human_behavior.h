@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "remote_mutex/remote_mutex.h"
 
 #include <table_task_sim/SimState.h>
-#include <table_task_sim/ObjStatus.h>
+#include <robotics_task_tree_msgs/ObjStatus.h>
 
 namespace task_net {
 	class HumanBehavior: public Behavior {
@@ -42,7 +42,7 @@ namespace task_net {
 	  bool PickAndPlaceDone();
 	  void Work();
 	  void StateCallback( table_task_sim::SimState msg);
-	  void ObjStatusCallback( table_task_sim::ObjStatus msg);
+	  void ObjStatusCallback( robotics_task_tree_msgs::ObjStatus msg);
 
 	  double obj_chance_;
 	  bool obj_started_;

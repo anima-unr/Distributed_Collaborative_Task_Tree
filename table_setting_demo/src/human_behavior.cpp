@@ -1,5 +1,5 @@
 #include <geometry_msgs/Pose.h>
-#include <table_setting_demo/ObjStatus.h>
+#include <robotics_task_tree_msgs/ObjStatus.h>
 #include <human_behavior.h>
 
 namespace task_net {
@@ -186,7 +186,7 @@ bool HumanBehavior::ActivationPrecondition() {
 }
 
 
-  void HumanBehavior::ObjStatusCallback( table_setting_demo::ObjStatus msg)
+  void HumanBehavior::ObjStatusCallback( robotics_task_tree_msgs::ObjStatus msg)
   {
     // table_state_ = msg;
     obj_chance_ = msg.chance;

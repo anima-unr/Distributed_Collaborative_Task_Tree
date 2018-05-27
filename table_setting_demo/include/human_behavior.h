@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "robotics_task_tree_eval/behavior.h"
 #include "remote_mutex/remote_mutex.h"
 
-#include <table_setting_demo/ObjStatus.h>
+#include <robotics_task_tree_msgs/ObjStatus.h>
 
 namespace task_net {
 	class HumanBehavior: public Behavior {
@@ -40,7 +40,7 @@ namespace task_net {
 	  void PickAndPlace(std::string object, ROBOT robot_des);
 	  bool PickAndPlaceDone();
 	  void Work();
-	  void ObjStatusCallback( table_setting_demo::ObjStatus msg);
+	  void ObjStatusCallback( robotics_task_tree_msgs::ObjStatus msg);
 
 	  double obj_chance_;
 	  bool obj_started_;
