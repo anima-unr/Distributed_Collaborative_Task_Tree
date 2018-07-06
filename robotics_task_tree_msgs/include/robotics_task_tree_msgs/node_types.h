@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "robotics_task_tree_msgs/State.h"
 #include "robotics_task_tree_msgs/ControlMessage.h"
-
+#include "robotics_task_tree_msgs/hold_status.h"
 namespace task_net {
 
 typedef enum {  // Eight possible node types
@@ -37,6 +37,7 @@ typedef enum {  // Eight possible node types
   ROOT,         // 4
   PLACE,        // 5
   BEHAVIOR_VM,  // 6
+  PICK,         //7
 } NodeTypes_t;
 
 typedef enum {  // Eight possible robots
@@ -71,7 +72,9 @@ struct State {
   float highest_potential;
   int parent_type;
   float suitability;
+
 };
+
 typedef State State_t;
 
 struct NodeId {
@@ -93,6 +96,13 @@ struct ControlMessage {
   NodeBitmask highest;
   int parent_type;
 };
+struct hold_status {
+   bool hold;
+   bool pick;
+   std::string object_name;
+};
+
+
 
 typedef std::vector<NodeId_t> NodeList;
 typedef std::vector<NodeId_t>::iterator NodeListIterator;

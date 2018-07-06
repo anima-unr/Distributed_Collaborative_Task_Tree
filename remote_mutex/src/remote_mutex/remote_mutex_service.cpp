@@ -65,7 +65,7 @@ class RemoteMutexService {
   robotics_task_tree_msgs::State top_level_state_;
 
   explicit RemoteMutexService(const char* name)
-      : record_object("/home/janelle/onr_ws/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
+      : record_object("/home/anima/catkin_workspace/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
         100) {
     locked = false;
     owner = "";

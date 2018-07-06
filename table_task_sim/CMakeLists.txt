@@ -58,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
    Robot.msg
    SimState.msg
    ObjStatus.msg
+   
  )
 
 ## Generate services in the 'srv' folder
@@ -165,7 +166,8 @@ include_directories(
 # dummy multi  
   add_executable(dummy_multi_demo
     src/dummy_multi_network.cc
-    src/dummy_behavior.cc
+    src/dummy_behavior_place.cc
+    src/dummy_behavior_pick.cc
   )
 
   add_dependencies(dummy_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -185,7 +187,8 @@ include_directories(
   add_executable(human_multi_demo
     src/human_multi_network.cc
     src/human_behavior.cpp
-    src/dummy_behavior.cc
+    src/dummy_behavior_place.cc
+    src/dummy_behavior_pick.cc
   )
 
   add_dependencies(human_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

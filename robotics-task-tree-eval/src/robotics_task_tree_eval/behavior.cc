@@ -164,7 +164,7 @@ ThenBehavior::ThenBehavior(NodeId_t name, NodeList peers, NodeList children,
       state,
       object) {
   // Initialize activation queue
-      // printf("ThenBehavior::ThenBehavior WAS CALLED\n");
+       printf("ThenBehavior::ThenBehavior WAS CALLED\n");
   for (NodeListPtrIterator it = children_.begin(); it != children_.end();
       ++it) {
     activation_queue_.push(*it);

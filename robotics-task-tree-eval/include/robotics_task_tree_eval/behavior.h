@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <queue>
 #include "robotics_task_tree_eval/node.h"
 #include "remote_mutex/remote_mutex.h"
-
+#include "robotics_task_tree_msgs/hold_status.h"
 enum ROBOT {
   PR2=0, 
   BAXTER=1
@@ -40,7 +40,7 @@ class Behavior: public Node {
     bool use_local_callback_queue = false,
     boost::posix_time::millisec mtime = boost::posix_time::millisec(BEHAVIOR_SLEEP_TIME));
   virtual ~Behavior();
-
+static task_net::hold_status hold_status_dummy1_;
  private:
 };
 

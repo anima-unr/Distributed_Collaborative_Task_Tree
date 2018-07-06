@@ -27,7 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include "robotics_task_tree_msgs/node_types.h"
 #include "robotics_task_tree_msgs/ControlMessage.h"
-
+#include "robotics_task_tree_msgs/hold_status.h"
+typedef robotics_task_tree_msgs::hold_status holdPtr;
 namespace task_net {
 
 typedef boost::shared_ptr<robotics_task_tree_msgs::ControlMessage const>
@@ -141,6 +142,7 @@ class Node {
   std::ofstream record_file;
   NodeId_t *name_;
   State state_;
+  hold_status hold_status_;//sd
   bool parent_done_;
   std::map<NodeBitmask, NodeId_t*, BitmaskLessThan> node_dict_;
   std::string name_id_;
@@ -150,7 +152,7 @@ class Node {
   NodeId_t *parent_;
 
   std::string object_;
-
+  
 
   // Publishers
   PubList children_pub_list_;
