@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
             							init_v,
             							false);
             							
-            ROS_INFO("Picking %d",init_v);
+           // ROS_INFO("Picking %d",init_v);
             if(init_v==0) //initially the first pick node will get a value which is 0. after that it will get 1.
             {
             	init_v=1;
