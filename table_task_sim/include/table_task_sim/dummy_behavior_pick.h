@@ -37,7 +37,7 @@ namespace task_net {
 	    bool use_local_callback_queue = false,
 	    boost::posix_time::millisec mtime = boost::posix_time::millisec(BEHAVIOR_SLEEP_TIME*1.5));
 	  virtual ~DummyBehaviorPick();
-	  void inithold();
+	  
 	  void UpdateActivationPotential();
 	  bool ActivationPrecondition();
 	  void Pick(std::string object, ROBOT robot_des);
