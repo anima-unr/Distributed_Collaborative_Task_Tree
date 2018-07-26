@@ -2,6 +2,7 @@
 #include <table_task_sim/PickUpObject.h>
 #include <table_task_sim/PlaceObject.h>
 #include <table_task_sim/dummy_behavior.h>
+#include <sound_play/sound_play.h>
 
 namespace task_net {
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +130,13 @@ void DummyBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
   req_pick.request.object_name = object;
   // table_task_sim::PickUpObject::Response res_pick; //to know if it failed or not...
 
+  //HOLD behavior will be here
+  //HOLD behavior includes holding an object, asking for help then wait for the human to complete this
+
+ 
+
+  
+  //HOLD behavior end
   // place
   geometry_msgs::Pose pose;
   pose.position.x = -0.45;
@@ -148,7 +156,9 @@ void DummyBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
   if(ros::service::call("pick_service", req_pick)) {
 
     ROS_INFO("\t\t[%s]: THE PICK SERVICE WAS CALLED!!", name_->topic.c_str());
-
+      sleep(1);
+  sc.say("help me to put the object");	
+  sleep(1);
     // call the place service
     if(ros::service::call("place_service", req_place)) {
       ROS_INFO("\t\t[%s]: THE PLACE SERVICE WAS CALLED!!", name_->topic.c_str());
