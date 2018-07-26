@@ -1,0 +1,26 @@
+objects:
+    - name      : clock
+      location  : {x: 0.1, y: 0.0}
+      scale     : {x: 0.05, y: 0.05, z: 0.05}
+      color     : {r: 0.5, g: 0.0, b: 0.5, a: 0.9}
+    - name      : teddy_bear
+      location  : {x: 0.25, y: -0.25}
+      scale     : {x: 0.05, y: 0.05, z: 0.05}
+      color     : {r: 0.0, g: 0.5, b: 0.5, a: 0.9}
+    - name      : scissors
+      location  : {x: 0.25, y: 0.25}
+      scale     : {x: 0.05, y: 0.05, z: 0.05}
+      color     : {r: 0.5, g: 0.5, b: 0.0, a: 0.9}
+    - name      : cup
+      location  : {x: -0.25, y: 0.25}
+      scale     : {x: 0.05, y: 0.05, z: 0.05}
+      color     : {r: 0.9, g: 0.0, b: 0.0, a: 0.9}
+    - name      : apple
+      location  : {x: -0.25, y: -0.25}
+      scale     : {x: 0.05, y: 0.05, z: 0.05}
+      color     : {r: 0.0, g: 0.9, b: 0.0, a: 0.9}
+robots:
+    - location  : {x: 0.0, y: -0.45}
+      color     : {r: 0.0, g: 0.0, b: 0.2, a: 0.9}
+    - location  : {x: 0.05, y: 0.45}
+      color     : {r: 0.0, g: 0.2, b: 0.0, a: 0.9}

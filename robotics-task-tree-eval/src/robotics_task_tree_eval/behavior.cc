@@ -30,13 +30,16 @@ Behavior::Behavior() {}
 Behavior::Behavior(NodeId_t name, NodeList peers, NodeList children,
     NodeId_t parent,
     State_t state,
+    std::string object,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : Node(name,
       peers,
       children,
       parent,
-      state) {  
+      state,
+      object) {  
       // printf("Behavior::Behavior WAS CALLED\n");
+  ROS_WARN("END OF BEHAVIOR CONSTRUCTOR");
 }
 Behavior::~Behavior() {}
 
@@ -48,13 +51,15 @@ AndBehavior::AndBehavior() {}
 AndBehavior::AndBehavior(NodeId_t name, NodeList peers, NodeList children,
     NodeId_t parent,
     State_t state,
+    std::string object,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : Behavior(name,
       peers,
       children,
       parent,
-      state) {
-        // printf("AndBehavior::AndBehavior WAS CALLED\n");
+      state,
+      object) {
+        printf("AndBehavior::AndBehavior WAS CALLED\n");
     }
 AndBehavior::~AndBehavior() {}
 
@@ -150,12 +155,14 @@ ThenBehavior::ThenBehavior() {}
 ThenBehavior::ThenBehavior(NodeId_t name, NodeList peers, NodeList children,
     NodeId_t parent,
     State_t state,
+    std::string object,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : Behavior(name,
       peers,
       children,
       parent,
-      state) {
+      state,
+      object) {
   // Initialize activation queue
       // printf("ThenBehavior::ThenBehavior WAS CALLED\n");
   for (NodeListPtrIterator it = children_.begin(); it != children_.end();
@@ -258,12 +265,14 @@ OrBehavior::OrBehavior() {}
 OrBehavior::OrBehavior(NodeId_t name, NodeList peers, NodeList children,
     NodeId_t parent,
     State_t state,
+    std::string object,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : Behavior(name,
       peers,
       children,
       parent,
-      state) {
+      state,
+      object) {
   seed = static_cast<uint32_t>(time(NULL));
   //random_child_selection = rand_r(&seed) % children_.size();
   // printf("OrBehavior::OrBehavior WAS CALLED\n");

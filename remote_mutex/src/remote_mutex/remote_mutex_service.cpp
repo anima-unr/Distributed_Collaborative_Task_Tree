@@ -65,7 +65,7 @@ class RemoteMutexService {
   robotics_task_tree_msgs::State top_level_state_;
 
   explicit RemoteMutexService(const char* name)
-      : record_object("/home/janelle/onr_ws/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
+      : record_object("/home/anima/catkin_workspace/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
         100) {
     locked = false;
     owner = "";
@@ -98,7 +98,7 @@ class RemoteMutexService {
 
   void RootStateCallback( robotics_task_tree_msgs::State msg)
   {
-    ROS_DEBUG( "RootStateCalback");
+    // ROS_INFO( "RootStateCalback");
     // get the current state variable and save it (for MutexRequest to read later)
     top_level_state_ = msg;
   }
@@ -112,14 +112,14 @@ class RemoteMutexService {
       // sleep diff rates between pr2 and baxter to offset them activating nodes at the same time...
       int offset = 75*enum_robot_;
       boost::this_thread::sleep(boost::posix_time::millisec(200+offset));
-      ROS_DEBUG("\tWAITED %d", 200+offset);
+      ROS_INFO("\tWAITED %d", 200+offset);
 
 
       ROS_INFO("asking for mutex lock [%f / %f] %s", activation_potential, req.activation_potential, req.name.c_str());
 
       if (locked) {
         res.success = false;
-        ROS_DEBUG("Mutex Already Locked - Denied Access: %s", req.name.c_str());
+        ROS_INFO("Mutex Already Locked - Denied Access: %s", req.name.c_str());
       } 
       else {
 

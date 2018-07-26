@@ -1,0 +1,6 @@
+<launch>
+  <node name="NodeTest" pkg="table_setting_demo" type="human_multi_demo_visionManip" output="screen">
+    <rosparam file="$(find table_setting_demo)/params/DARS_test.yaml"/>
+    <param name="robot" value="PR2"/>
+  </node>
+</launch>

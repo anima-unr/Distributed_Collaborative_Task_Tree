@@ -1,0 +1,7 @@
+<launch>
+
+<node pkg="tf" type="static_transform_publisher" name="test_frame" args="1 0 0 0 0 0 1 camera_link test 100"/>
+<node pkg="example_code" type="project_node" name="project"/>
+
+
+</launch>

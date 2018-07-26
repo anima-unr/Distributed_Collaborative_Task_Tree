@@ -1,0 +1,244 @@
+NodeList: ['ROOT_4_0_000', 'AND_2_0_001', 'PLACE_3_0_002', 'PLACE_3_0_003', 'PLACE_3_0_004', 'PLACE_3_0_005', 'PLACE_3_0_006', 'PLACE_3_0_007' ]
+Nodes: 
+  ROOT_4_0_000:
+    mask:
+      type: 4
+      robot: 0
+      node: 0
+    parent: 'NONE'
+    children: ['AND_2_0_001']
+    peers: ['NONE']
+  AND_2_0_001:
+    mask:
+      type: 2
+      robot: 0
+      node: 1
+    parent: ROOT_4_0_000
+    children: ['PLACE_3_0_002', 'PLACE_3_0_003', 'PLACE_3_0_004', 'PLACE_3_0_005', 'PLACE_3_0_006', 'PLACE_3_0_007']
+    peers: ['NONE']
+  PLACE_3_0_002:
+    mask:
+      type: 6
+      robot: 0
+      node: 2
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: book
+  PLACE_3_0_003:
+    mask:
+      type: 6
+      robot: 0
+      node: 3
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: teddy_bear
+  PLACE_3_0_004:
+    mask:
+      type: 6
+      robot: 0
+      node: 4
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: bowl
+  PLACE_3_0_005:
+    mask:
+      type: 6
+      robot: 0
+      node: 5
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: cup
+  PLACE_3_0_006:
+    mask:
+      type: 6
+      robot: 0
+      node: 6
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: clock
+  PLACE_3_0_007:
+    mask:
+      type: 6
+      robot: 0
+      node: 7
+    parent: AND_2_0_001
+    children: ['NONE']
+    peers: ['NONE']
+    object: scissors
+
+
+
+
+# NodeList: ['PLACE_3_0_002',
+#         'PLACE_3_0_003',
+#         'PLACE_3_0_004',
+#         'PLACE_3_0_005',
+#         'PLACE_3_0_006',
+#         'PLACE_3_0_007',
+#         'AND_2_0_001',
+#         'ROOT_4_0_000',
+#         'PLACE_3_1_010',
+#         'PLACE_3_1_011',
+#         'PLACE_3_1_012',
+#         'PLACE_3_1_013',
+#         'PLACE_3_1_014',
+#         'PLACE_3_1_015',
+#         'AND_2_1_009',
+#         'ROOT_4_1_008'
+#         ]
+
+
+# PLACE_3_0_002:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 2
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_1_010']
+#   object: book
+# PLACE_3_0_003:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 3
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_1_011']
+#   object: teddy_bear
+# PLACE_3_0_004:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 4
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_1_012']
+#   object: bowl
+# PLACE_3_0_005:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 5
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_1_014']
+#   object: cup
+# PLACE_3_0_006:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 6
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['NONE']
+#   object: clock
+# PLACE_3_0_007:
+#   mask:
+#     type: 6
+#     robot: 0
+#     node: 7
+#   parent: AND_2_0_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_1_015']
+#   object: scissors
+# AND_2_0_001:
+#   mask:
+#     type: 2
+#     robot: 0
+#     node: 1
+#   parent: ROOT_4_0_000
+#   children: ['PLACE_3_0_002', 'PLACE_3_0_003', 'PLACE_3_0_004', 'PLACE_3_0_005', 'PLACE_3_0_006', 'PLACE_3_0_007']
+#   peers: ['AND_2_1_009']
+# ROOT_4_0_000:
+#   mask:
+#     type: 4
+#     robot: 0
+#     node: 0
+#   parent: 'NONE'
+#   children: ['AND_2_0_001']
+#   peers: ['ROOT_4_1_008']
+
+
+
+# # ------------------------------------------------
+
+
+
+# PLACE_3_1_010:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 10
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_002']
+#   object: book
+# PLACE_3_1_011:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 11
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_003']
+#   object: teddy_bear
+# PLACE_3_1_012:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 12
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_004']
+#   object: bowl
+# PLACE_3_1_013:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 13
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_005']
+#   object: cup
+# PLACE_3_1_014:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 14
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_006']
+#   object: clock
+# PLACE_3_1_015:
+#   mask:
+#     type: 6
+#     robot: 1
+#     node: 15
+#   parent: AND_2_1_001
+#   children: ['NONE']
+#   peers: ['PLACE_3_0_007']
+#   object: scissors
+# AND_2_1_009:
+#   mask:
+#     type: 2
+#     robot: 1
+#     node: 9
+#   parent: ROOT_4_1_000
+#   children: ['PLACE_3_0_002', 'PLACE_3_0_003', 'PLACE_3_0_004', 'PLACE_3_0_005', 'PLACE_3_0_006', 'PLACE_3_0_007']
+#   peers: ['AND_2_0_001']
+# ROOT_4_1_008:
+#   mask:
+#     type: 4
+#     robot: 1
+#     node: 8
+#   parent: 'NONE'
+#   children: ['AND_2_1_001']
+#   peers: ['ROOT_4_0_000']
+
+

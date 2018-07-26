@@ -173,7 +173,13 @@ if __name__ == '__main__':
   # output preorder tree traversal
 
   # Perform Depth first search
-  string = "(THEN_0_1_001 PLACE_3_1_002 (AND_3_1_003 (OR_3_1_004 PLACE_3_1_009 PLACE_3_1_010 PLACE_3_1_011) PLACE_3_1_005 PLACE_3_1_006 (THEN_0_1_007 PLACE_3_1_012 PLACE_3_1_013) PLACE_3_1_008))"
+  # string = "(THEN_0_1_001 PLACE_3_1_002 (AND_3_1_003 (OR_3_1_004 PLACE_3_1_009 PLACE_3_1_010 PLACE_3_1_011) PLACE_3_1_005 PLACE_3_1_006 (THEN_0_1_007 PLACE_3_1_012 PLACE_3_1_013) PLACE_3_1_008))"
+
+  # TEA-TIME_Baxter
+  # string =  "(AND_2_1_014 (THEN_0_1_015 PLACE_3_1_016 (AND_2_1_017 PLACE_3_1_018 PLACE_3_1_019)) (THEN_0_1_020 PLACE_3_1_021 (OR_1_1_022 PLACE_3_1_023 PLACE_3_1_024) PLACE_3_1_025))"
+  # TEA-TIME_PR2
+  string =  "(AND_2_0_001 (THEN_0_0_002 PLACE_3_0_003 (AND_2_0_004 PLACE_3_0_005 PLACE_3_0_006)) (THEN_0_0_007 PLACE_3_0_008 (OR_1_0_009 PLACE_3_0_010 PLACE_3_0_011) PLACE_3_0_012))"
+
   parse_str = parse(string)
   order = dict()
   for i, node in enumerate(DepthFirstOrder(parse_str)):

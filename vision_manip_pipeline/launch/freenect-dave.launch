@@ -1,0 +1,19 @@
+<launch>
+    <include file="$(find freenect_launch)/launch/freenect.launch">
+      <arg name="depth_registration" value="true" />
+      <arg name="load_driver" value="false" />
+      <arg name="publish_tf" value="false" />
+      <arg name="camera" value="local" />
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="orthographic_proj" args="0 -1 1 0 1 0 0 torso_lift_link test 100" />
+    <node pkg="tf" type="static_transform_publisher" name="orthographic_proj_kinect" args="0.989 -0.128 -0.346 -0.286 0.299 0.659 0.628 test head_mount_kinect_rgb_optical_frame 100" />
+
+
+- Translation: [0.989, -0.128, -0.346]
+- Rotation: in Quaternion [-0.286, 0.299, 0.659, 0.628]
+
+
+</launch>
+
+

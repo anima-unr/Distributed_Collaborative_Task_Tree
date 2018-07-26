@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_msgs
 )
 #find_package(GTest REQUIRED)
-find_package(Eigen)
+#find_package(Eigen)
 find_package(Boost REQUIRED COMPONENTS
   thread
   python

@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
       // printf("MADE 5\n");
     }
   }
-  printf("MADE 6 - now spinning\n");
+  printf("now spinning\n");
   ros::spin();
   return 0;
 }

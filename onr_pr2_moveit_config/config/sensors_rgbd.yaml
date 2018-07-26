@@ -8,6 +8,7 @@ sensors:
    padding_offset: 0.03
 
 
+
 #sensors: 
 # - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
 #   point_cloud_topic: /tilt_cloud
@@ -17,4 +18,5 @@ sensors:
 #   padding_scale: 2.0
 #   padding_offset: 0.03
 #   filtered_cloud_topic: tilt_scan_self_filtered_cloud
+
 

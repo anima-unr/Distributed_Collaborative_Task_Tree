@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   robotics_task_tree_eval
   remote_mutex
+  sound_play
 )
 
 ## System dependencies are found with CMake's conventions
@@ -57,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
    Object.msg
    Robot.msg
    SimState.msg
+   ObjStatus.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -113,7 +115,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES table_task_sim
-  CATKIN_DEPENDS roscpp rospy visualization_msgs message_runtime robotics_task_tree_eval remote_mutex
+  CATKIN_DEPENDS roscpp rospy visualization_msgs message_runtime robotics_task_tree_eval remote_mutex sound_play
   DEPENDS yaml-cpp
 )
 
@@ -177,6 +179,23 @@ include_directories(
   #add_dependencies(dummy_multi_demo
   #  table_setting_demo_generate_messages_cpp
   #)
+
+
+
+# human multi  
+  add_executable(human_multi_demo
+    src/human_multi_network.cc
+    src/human_behavior.cpp
+    src/dummy_behavior.cc
+  )
+
+  add_dependencies(human_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+  target_link_libraries(human_multi_demo
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
+  )
+
 
 
 #############

@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "robotics_task_tree_msgs/State.h"
 #include "log.h"
+#include "vision_manip_pipeline/VisionManip.h"
 // #include <regex>
 
 namespace task_net {
@@ -37,6 +38,124 @@ namespace task_net {
 void PeerCheckThread(Node *node);
 
 
+//---------------
+
+float getSuitability(uint16_t node, uint8_t robot, std::string object, ros::ServiceClient *visManipClient_pntr) {
+
+  // if not a behavior node, object will be 'N/A' -> so set suitability to be 1?!??
+  if( object.compare("N/A") == 0) {
+    ROS_INFO("Node has no object, so setting suitability to 1...");
+    return 1; //TODO JB INTEGRATION -- what should this beeeee?!?!!?
+  } 
+
+  // for now just strictly hard code objects for each robot.....
+  // this param is only used in dummy behavior, so it does not affect THEN AND OR nodes!
+
+  // define for pr2
+  if(robot == 0) {
+    // // Cup
+    // if( node == 3 ){
+    //   return 1.0;
+    // }
+    // // Sugar
+    // if( node == 5 ){
+    //   return 0.25;
+    // }
+    // // Tea
+    // if( node == 6 ){
+    //   return 1.0;
+    // }
+    // // Left_Bread
+    // if( node == 8 ){
+    //   return 0.0;
+    // }
+    // // Meat
+    // if( node == 10 ){
+    //   return 0.0;
+    // }
+    // // Lettuce
+    // if( node == 11 ){
+    //   return 0.0;
+    // }
+    // // Right_Bread
+    // if( node == 12 ){
+    //   return 0.0;
+    // }
+
+    // instead call vision manip pipeline....
+    vision_manip_pipeline::VisionManip visManipSrv;
+    visManipSrv.request.obj_name = object.c_str();
+    std::cout << "Trying Object:    " << object.c_str() << '\n';
+    if(visManipClient_pntr->call(visManipSrv)){
+      // ROS_INFO("NewX: %f NewY: %f NewZ: %f", (float)srv.response.newX, (float)srv.response.newY, (float)srv.response.newZ);
+      std::cout << "Object:             " << object.c_str() << '\n';
+      std::cout << "Approach Pose:      " << visManipSrv.response.approach_pose << '\n';
+      std::cout << "Pick Pose:          " << visManipSrv.response.pick_pose << '\n';
+      std::cout << "Score of Top Grasp: " << visManipSrv.response.score << '\n';
+      std::cout << "Top Valid Grasp:    " << visManipSrv.response.grasp << '\n';
+      return visManipSrv.response.score.data;
+    }
+    else{
+      ROS_ERROR("Failed to call service vision_manip, setting score to 0 for object: %s!", object.c_str());
+      return 0.0;
+    }
+  }
+
+  //define for baxter
+  else if(robot == 1) {
+    // // Cup
+    // if( node == 16 ){
+    //   return 0.0;
+    // }
+    // // Sugar
+    // if( node == 18 ){
+    //   return 0.75;
+    // }
+    // // Tea
+    // if( node == 19 ){
+    //   return 0.0;
+    // }
+    // // Left_Bread
+    // if( node == 21 ){
+    //   return 1.0;
+    // }
+    // // Meat
+    // if( node == 23 ){
+    //   return 1.0;
+    // }
+    // // Lettuce
+    // if( node == 24 ){
+    //   return 1.0;
+    // }
+    // // Right_Bread
+    // if( node == 25 ){
+    //   return 1.0;
+    // }
+
+    // instead call vision manip pipeline....
+    vision_manip_pipeline::VisionManip visManipSrv;
+    visManipSrv.request.obj_name = object.c_str();
+    std::cout << "Trying Object:    " << object.c_str() << '\n';
+    if(visManipClient_pntr->call(visManipSrv)){
+      // ROS_INFO("NewX: %f NewY: %f NewZ: %f", (float)srv.response.newX, (float)srv.response.newY, (float)srv.response.newZ);
+      std::cout << "Object:             " << object.c_str() << '\n';
+      std::cout << "Approach Pose:      " << visManipSrv.response.approach_pose << '\n';
+      std::cout << "Pick Pose:          " << visManipSrv.response.pick_pose << '\n';
+      std::cout << "Score of Top Grasp: " << visManipSrv.response.score << '\n';
+      std::cout << "Top Valid Grasp:    " << visManipSrv.response.grasp << '\n';
+      return visManipSrv.response.score.data;
+    }
+    else{
+      ROS_ERROR("Failed to call service vision_manip, setting score to 0 for object: %s!", object.c_str());
+      return 0.0;
+    }
+  }
+  
+}
+
+//---------------
+
+
 Node::Node() {
   state_.active = false;
   state_.done = false;
@@ -46,6 +165,7 @@ Node::Node() {
 
 Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
     State_t state,
+    std::string object,
     bool use_local_callback_queue, boost::posix_time::millisec mtime):
     local_("~") {
   if (use_local_callback_queue) {
@@ -53,7 +173,11 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
     pub_nh_.setCallbackQueue(pub_callback_queue_);
     sub_nh_.setCallbackQueue(sub_callback_queue_);
   }
-    // ROS_INFO("Node::Node was called!!!!\n");
+    ROS_WARN("Node::Node was called!!!!\n");
+
+  // set client for vision manip pipeline
+  ros::ServiceClient visManipClient = local_.serviceClient<vision_manip_pipeline::VisionManip>("/vision_manip");
+  visManipClient_pntr = &visManipClient;
 
   // Generate reverse map
   GenerateNodeBitmaskMap();
@@ -63,11 +187,15 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
     if(strcmp(it->topic.c_str(), "NONE") != 0) {
       peers_.push_back(node_dict_[GetBitmask(it->topic)]);
       // NOTE: THIS IS PROBABLY IN THE WRONG SPOT NOW BUT IT WAS CAUSING ISSUES BELOW!
+      ROS_WARN( "PEER OKAY" );
     }
   }
 
   for (NodeListIterator it = children.begin(); it != children.end(); ++it) {
-    children_.push_back(node_dict_[GetBitmask(it->topic)]);
+    if(strcmp(it->topic.c_str(), "NONE") != 0) {
+      children_.push_back(node_dict_[GetBitmask(it->topic)]);
+      ROS_WARN( "CHILD IS FOUND" );
+    }
   }
   parent_ = node_dict_[GetBitmask(parent.topic)];
   // Setup bitmasks
@@ -75,6 +203,8 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
   InitializeBitmasks(peers_);
   InitializeBitmasks(children_);
   InitializeBitmask(parent_);
+
+  ROS_WARN( "BITMASKS" );
 
   state_ = state;
   state_.owner = name_->mask;
@@ -90,16 +220,9 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
   state_.highest_potential = 0.0;
   thread_running_ = false;
 
-  // state_.parent_type = parent.mask.type;
-  // std::smatch m;
-  // std::regex e ("_\\d_");
-  // std:: string s = parent.topic;
-  // while (std::regex_search (s,m,e)) {
-  //   for (auto x:m) std::cout << x << " ";
-  //   std::cout << std::endl;
-  //   s = m.suffix().str();
-  // }
-  // state_.parent_type = s[1];
+  object_ = object;
+
+  // parse out parent type
   int i = 0;
   std::string type;
   while(parent.topic[i] != '_'){
@@ -109,6 +232,13 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
   type = parent.topic[i];
   state_.parent_type = std::stoi(type, nullptr,10);
   ROS_INFO("PARENT TYPE %d", state_.parent_type);
+
+
+  ROS_WARN( "BITMASKS" );
+
+  // get suitability of node based on robot
+  // NOTE: this param is only used in dummy/place behavior, so it does not affect THEN AND OR nodes!
+  state_.suitability = getSuitability(state_.owner.node, state_.owner.robot, object_, visManipClient_pntr);   
 
   // Get bitmask
   // printf("name: %s\n", name_->topic.c_str());
@@ -122,6 +252,8 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
   InitializeStatePublisher(name_, &self_pub_, "_state");
 
   NodeInit(mtime);
+
+  ROS_WARN("END OF NODE CONSTRUCTOR");
 
 }
 
@@ -367,6 +499,7 @@ void Node::ReceiveFromPeers(ConstControlMessagePtr_t msg) {
 // Main Loop of Update Thread. spins once every mtime milliseconds
 void UpdateThread(Node *node, boost::posix_time::millisec mtime) {
     ROS_DEBUG("Node::UpdateThread was called!!!!");
+    sleep(5);
   while (true) {
     node->Update();
     boost::this_thread::sleep(mtime);
@@ -550,6 +683,8 @@ void Node::RecordToFile() {
         << state_.activation_potential
         << ","
         << working
+        << ","
+        << state_.suitability
         << "\n";
         record_file.flush();
 }
@@ -573,7 +708,7 @@ void Node::NodeInit(boost::posix_time::millisec mtime) {
   // peer_check_thread  = new boost::thread(&PeerCheckThread, this);
 
   // Initialize recording Thread
-  std::string filename = "/home/janelle/onr_ws/src/Distributed_Collaborative_Task_Tree/Data/" + name_->topic + "_Data_.csv";
+  std::string filename = "/home/anima/catkin_workspace/src/Distributed_Collaborative_Task_Tree/Data/" + name_->topic + "_Data_.csv";
   ROS_INFO("Creating Data File: %s", filename.c_str());
   record_file.open(filename.c_str());
   record_file.precision(15);

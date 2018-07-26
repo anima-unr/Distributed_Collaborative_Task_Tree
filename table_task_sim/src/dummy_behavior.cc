@@ -2,6 +2,7 @@
 #include <table_task_sim/PickUpObject.h>
 #include <table_task_sim/PlaceObject.h>
 #include <table_task_sim/dummy_behavior.h>
+#include <sound_play/sound_play.h>
 
 namespace task_net {
 ////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +20,8 @@ DummyBehavior::DummyBehavior(NodeId_t name, NodeList peers, NodeList children,
       peers,
       children,
       parent,
-      state), mut_arm(name.topic.c_str(), "/right_arm_mutex") {
+      state ,
+      object), mut_arm(name.topic.c_str(), "/right_arm_mutex") {
 
     object_ = object;
     state_.done = false;
@@ -81,10 +83,13 @@ void DummyBehavior::UpdateActivationPotential() {
   }
   opos = table_state_.objects[obj_idx].pose.position;
 
+
+  double c1 = 1.0; // weight for distance
+  double c2 = 1.0; //weight for suitability
   double dist = hypot(rpos.y - opos.y, rpos.x - opos.x);
 
   if( fabs(dist) > 0.00001 )
-      state_.activation_potential = 1.0f / dist;
+      state_.activation_potential = ( c1 * (1.0f / dist)) + (c2 * state_.suitability);
   else state_.activation_potential = 0.00000001;
 
   ROS_DEBUG_NAMED("DummyBehavior", "%s: activation_potential: [%f]", object_.c_str(), state_.activation_potential );
@@ -125,6 +130,13 @@ void DummyBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
   req_pick.request.object_name = object;
   // table_task_sim::PickUpObject::Response res_pick; //to know if it failed or not...
 
+  //HOLD behavior will be here
+  //HOLD behavior includes holding an object, asking for help then wait for the human to complete this
+
+ 
+
+  
+  //HOLD behavior end
   // place
   geometry_msgs::Pose pose;
   pose.position.x = -0.45;
@@ -144,7 +156,9 @@ void DummyBehavior::PickAndPlace(std::string object, ROBOT robot_des) {
   if(ros::service::call("pick_service", req_pick)) {
 
     ROS_INFO("\t\t[%s]: THE PICK SERVICE WAS CALLED!!", name_->topic.c_str());
-
+      sleep(1);
+  sc.say("help me to put the object");	
+  sleep(1);
     // call the place service
     if(ros::service::call("place_service", req_place)) {
       ROS_INFO("\t\t[%s]: THE PLACE SERVICE WAS CALLED!!", name_->topic.c_str());
