@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "remote_mutex/remote_mutex.h"
 
 #include <table_task_sim/SimState.h>
+#include <sound_play/sound_play.h>
 
 namespace task_net {
 	class DummyBehavior: public Behavior {
@@ -47,7 +48,8 @@ namespace task_net {
 	  mutex::RemoteMutex mut_arm;
 	  std::string object_;
 	  ROBOT robot_des_;
-
+ 	  ros::NodeHandle nh;
+          sound_play::SoundClient sc;
 	  ros::Subscriber state_sub_;
 	  table_task_sim::SimState table_state_;
 	};

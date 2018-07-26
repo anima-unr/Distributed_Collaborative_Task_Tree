@@ -708,7 +708,7 @@ void Node::NodeInit(boost::posix_time::millisec mtime) {
   // peer_check_thread  = new boost::thread(&PeerCheckThread, this);
 
   // Initialize recording Thread
-  std::string filename = "/home/janelle/onr_ws/src/Distributed_Collaborative_Task_Tree/Data/" + name_->topic + "_Data_.csv";
+  std::string filename = "/home/anima/catkin_workspace/src/Distributed_Collaborative_Task_Tree/Data/" + name_->topic + "_Data_.csv";
   ROS_INFO("Creating Data File: %s", filename.c_str());
   record_file.open(filename.c_str());
   record_file.precision(15);

@@ -81,7 +81,7 @@ static const char *static_object_str[] = {
   // DARS DEMO
   "bird",
   // "orange",
-  "apple",
+  "sports_ball",
   "clock",
   // "bottle",
   "scissors",

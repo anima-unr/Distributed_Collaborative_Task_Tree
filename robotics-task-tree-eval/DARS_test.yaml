@@ -68,7 +68,7 @@ Nodes:
     parent: AND_2_0_002
     children: ['NONE']
     peers: ['PLACE_3_1_014']
-    object: scissors
+    object: apple
   OR_1_0_006:
     mask:
       type: 1
@@ -94,7 +94,7 @@ Nodes:
     parent: OR_1_0_006
     children: ['NONE']
     peers: ['PLACE_3_1_017']
-    object: apple
+    object: scissors
 
 # ---------------------------------------------
 
@@ -149,7 +149,7 @@ Nodes:
     parent: AND_2_1_011
     children: ['NONE']
     peers: ['PLACE_3_0_005']
-    object: scissors
+    object: apple
   OR_1_1_015:
     mask:
       type: 1
@@ -175,5 +175,5 @@ Nodes:
     parent: OR_1_1_015
     children: ['NONE']
     peers: ['PLACE_3_0_008']
-    object: apple
+    object: scissors
 

@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   robotics_task_tree_eval
   remote_mutex
+  sound_play
 )
 
 ## System dependencies are found with CMake's conventions
@@ -114,7 +115,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES table_task_sim
-  CATKIN_DEPENDS roscpp rospy visualization_msgs message_runtime robotics_task_tree_eval remote_mutex
+  CATKIN_DEPENDS roscpp rospy visualization_msgs message_runtime robotics_task_tree_eval remote_mutex sound_play
   DEPENDS yaml-cpp
 )
 

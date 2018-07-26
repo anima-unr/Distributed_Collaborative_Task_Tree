@@ -147,7 +147,7 @@ def main():
     server.sub_port = rospy.get_param('~sub_port', '5565')
     server.pub_port = rospy.get_param('~pub_port', '5566')
     server.address = 'localhost'
-    # server.address = '134.197.42.138'
+    #server.address = '134.197.40.220'
     running_event = threading.Event()
     running_event.set()
     print 'Creating Nodes'

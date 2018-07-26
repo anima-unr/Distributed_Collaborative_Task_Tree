@@ -16,7 +16,7 @@ Terminal 4:
 
 
 Terminal 5:
-   roslaunch remote_mutex table_setting_mutex_baxter.launch
+   /TH0.0
 
 Terminal 6:
   rostopic pub /THEN_0_1_010_parent robotics_task_tree_msgs/ControlMesge "sender: {type: 0, robot: 0, node: 0}
