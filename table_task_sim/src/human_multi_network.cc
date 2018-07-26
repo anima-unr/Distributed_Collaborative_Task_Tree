@@ -28,8 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "robotics_task_tree_eval/behavior.h"
 #include "robotics_task_tree_msgs/node_types.h"
 #include "remote_mutex/remote_mutex.h"
-#include <table_task_sim/dummy_behavior.h>
 #include <table_task_sim/human_behavior.h>
+#include <table_task_sim/dummy_behavior_place.h>
+#include <table_task_sim/dummy_behavior_pick.h>
 
 
 typedef std::vector<std::string> NodeParam;
@@ -58,6 +59,10 @@ int main(int argc, char *argv[]) {
   task_net::NodeId_t parent_param;
   NodeParam nodes;
   std::string obj_name;
+   task_net::hold_status hold_status_dummy;
+  
+   // hold_status_dummy.object_name = "N/A";
+    //hold_status_dummy.hold = false;
   
   // get the robot  
   std::string Robot;
@@ -164,6 +169,33 @@ int main(int argc, char *argv[]) {
                                         false);
             // printf("\ttask_net::AND %d\n",task_net::AND);
             break;
+	  	  case task_net::PICK:
+            // ROS_INFO("Children Size: %lu", children_param.size());
+            // object = name_param.topic.c_str();
+           // get the name of the object of corresponding node:
+            nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
+            // set up network for corresponding node:
+
+            // if robot is PR2, use dummy behavior
+            if( robot_des == PR2 ) {
+
+              network[i] = new task_net::DummyBehaviorPick(name_param,peers_param,children_param,parent_param,state,obj_name,robot_des,false);
+            }
+
+            // // if robot is BAXTER, use human behavior 
+            else{ 
+              network[i] = new task_net::HumanBehavior(name_param,
+                                        peers_param,
+                                        children_param,
+                                        parent_param,
+                                        state,
+                                        obj_name,
+                                        robot_des,
+                                        false);
+              }
+            // printf("\ttask_net::PLACE %d\n",task_net::PLACE);
+            break;
+	
           case task_net::PLACE:
             // ROS_INFO("Children Size: %lu", children_param.size());
             // object = name_param.topic.c_str();
@@ -174,7 +206,7 @@ int main(int argc, char *argv[]) {
             // if robot is PR2, use dummy behavior
             if( robot_des == PR2 ) {
 
-              network[i] = new task_net::DummyBehavior(name_param,
+              network[i] = new task_net::DummyBehaviorPlace(name_param,
                                         peers_param,
                                         children_param,
                                         parent_param,

@@ -28,7 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "robotics_task_tree_eval/behavior.h"
 #include "robotics_task_tree_msgs/node_types.h"
 #include "remote_mutex/remote_mutex.h"
-#include <table_task_sim/dummy_behavior.h>
+#include <table_task_sim/dummy_behavior_place.h>
+#include <table_task_sim/dummy_behavior_pick.h>
+
+#include <table_task_sim/header.h>
 
 
 typedef std::vector<std::string> NodeParam;
@@ -57,6 +60,11 @@ int main(int argc, char *argv[]) {
   task_net::NodeId_t parent_param;
   NodeParam nodes;
   std::string obj_name;
+  static task_net::hold_status hold_status_dummy;
+  
+    //hold_status_dummy.object_name = "N/A";
+    //hold_status_dummy.hold = false;
+    //hold_status_dummy.pick = false;
   
   // get the robot  
   std::string Robot;
@@ -81,6 +89,7 @@ int main(int argc, char *argv[]) {
   std::string param_ext_children = "children";
   std::string param_ext_parent = "parent";
   std::string param_ext_peers = "peers";
+  bool init_v=0;
   for(int i=0; i < nodes.size(); ++i) {
     // Get name
     name_param.topic = nodes[i];
@@ -88,6 +97,7 @@ int main(int argc, char *argv[]) {
 
     // only init the nodes for the correct robot!!!
     int robot;
+    
     if (nh_.getParam((param_prefix + nodes[i] + "/mask/robot").c_str(), robot)) {
       if(robot == robot_des) {
       
@@ -134,6 +144,7 @@ int main(int argc, char *argv[]) {
 
         switch (type) {
           case task_net::THEN:
+          	ROS_INFO("THENING");
             network[i] = new task_net::ThenBehavior(name_param,
                                         peers_param,
                                         children_param,
@@ -163,11 +174,30 @@ int main(int argc, char *argv[]) {
                                         false);
             // printf("\ttask_net::AND %d\n",task_net::AND);
             break;
-          case task_net::PLACE:
+            case task_net::PICK:
             // ROS_INFO("Children Size: %lu", children_param.size());
             // object = name_param.topic.c_str();
            // get the name of the object of corresponding node:
+          	
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
+           
+            network[i] = new task_net::DummyBehaviorPick(name_param,
+            							peers_param,
+            							children_param,
+            							parent_param,
+            							state,
+            							obj_name,
+            							robot_des,
+            							init_v,
+            							false);
+            							
+           // ROS_INFO("Picking %d",init_v);
+            if(init_v==0) //initially the first pick node will get a value which is 0. after that it will get 1.
+            {
+            	init_v=1;
+            
+            }
+     
             // set up network for corresponding node:
             // ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
             // network[i] = new task_net::TableObject(name_param,
@@ -180,7 +210,35 @@ int main(int argc, char *argv[]) {
             //                           neutral_object_pos,
             //                           object_pos,
             //                           false);
-            network[i] = new task_net::DummyBehavior(name_param,
+            /*network[i] = new task_net::DummyBehaviorPick(name_param,
+                                        peers_param,
+                                        children_param,
+                                        parent_param,
+                                        state,
+                                        obj_name,
+                                        robot_des,
+                                        false);*/
+            // printf("\ttask_net::PLACE %d\n",task_net::PLACE);
+            break;
+          case task_net::PLACE:
+            // ROS_INFO("Children Size: %lu", children_param.size());
+            // object = name_param.topic.c_str();
+           // get the name of the object of corresponding node:
+            nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
+            
+            // set up network for corresponding node:
+            // ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
+            // network[i] = new task_net::TableObject(name_param,
+            //                           peers_param,
+            //                           children_param,
+            //                           parent_param,
+            //                           state,
+            //                           "/right_arm_mutex",
+            //                           obj_name.c_str(),
+            //                           neutral_object_pos,
+            //                           object_pos,
+            //                           false);
+            network[i] = new task_net::DummyBehaviorPlace(name_param,
                                         peers_param,
                                         children_param,
                                         parent_param,
@@ -195,6 +253,7 @@ int main(int argc, char *argv[]) {
             network[i] = NULL;
             // printf("\ttask_net::ROOT %d\n",task_net::ROOT);
             break;
+          
         }
       }
       // printf("MADE 5\n");

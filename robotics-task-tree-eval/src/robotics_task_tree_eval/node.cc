@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "robotics_task_tree_msgs/State.h"
 #include "log.h"
 #include "vision_manip_pipeline/VisionManip.h"
+#include "robotics_task_tree_msgs/hold_status.h"
 // #include <regex>
 
 namespace task_net {
@@ -219,6 +220,13 @@ Node::Node(NodeId_t name, NodeList peers, NodeList children, NodeId_t parent,
   state_.highest = name_->mask;
   state_.highest_potential = 0.0;
   thread_running_ = false;
+  
+  /*hold_status_.hold = false;
+  hold_status_.pick = false;
+  hold_status_.object_name = "N/A";8*/
+  
+  //hold_status.hold= false;
+  //hold_status.object ="N/A"
 
   object_ = object;
 

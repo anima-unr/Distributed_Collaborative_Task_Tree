@@ -6,7 +6,7 @@
 		<param name="fixed_frame" type="string" value="base_link" />
 	</node>
 
-	<node name="pr2_sim_laser_link" type="static_transform_publisher" pkg="tf" args="0 0 0 0 0 0 laser_tilt_link pr2/laser_tilt_link 50"/>
+	<!--<node name="pr2_sim_laser_link" type="static_transform_publisher" pkg="tf" args="0 0 0 0 0 0 laser_tilt_link pr2/laser_tilt_link 50"/>-->
 
 	<node name="tilt_scan" pkg="tilt_scan" type="assemble_scans.py"/>
 </launch>
