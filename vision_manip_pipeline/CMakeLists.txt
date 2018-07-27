@@ -50,7 +50,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 find_package(cmake_modules REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen REQUIRED)
 include_directories(
   include
   ${EIGEN_INCLUDE_DIRS}
