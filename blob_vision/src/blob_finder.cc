@@ -30,16 +30,16 @@
 
 
 #include "ros/ros.h"
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "image_transport/image_transport.h"
 //#include "image_geometry/pinhole_camera_model.h"
 #include "sensor_msgs/Image.h"
-#include "cv_bridge/CvBridge.h"
+#include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/fill_image.h"
 
 //#include "contour_fcns.h"
-#include "color_finder.h"
+#include "blob_vision/color_finder.h"
 
 //#include "ray.h"
 
@@ -47,120 +47,82 @@ using namespace std;
 
 class ImageSplitter
 {
-public:
-  ros::NodeHandle n;
-private:
-  ros::Publisher hsv_pub;
-  ros::Publisher foreground_pub;
+  public:
+    ros::NodeHandle n;
+  private:
+    ros::Publisher hsv_pub;
+    ros::Publisher foreground_pub;
 
-  sensor_msgs::CvBridge img_bridge_;
-  sensor_msgs::Image img_;
-  IplImage *hsv_img_, *disp_;
-	bool first;
-  int display;
+    sensor_msgs::CvBridge img_bridge_;
+    sensor_msgs::Image img_;
+    IplImage *hsv_img_, *disp_;
+    bool first;
+    int display;
 
-  IplConvKernel *kernel_;
-  CvMemStorage* storage_;
-  vector<ColorFinder> color_finders_;
-  vector<CvScalar> colors_;
+    IplConvKernel *kernel_;
+    CvMemStorage* storage_;
+    vector<ColorFinder> color_finders_;
+    vector<CvScalar> colors_;
 
-	//int vmin, vmax, smin;
-
+    //int vmin, vmax, smin;
   public:
 
   void image_cb( const sensor_msgs::ImageConstPtr& msg )
   {
-    sensor_msgs::Image img_msg = *(msg.get());
-    if( img_bridge_.fromImage( img_msg, "bgr8" ) )
-    {
-      ros::Time img_time = msg->header.stamp;
-      IplImage* frame = img_bridge_.toIpl();
-
-      if( frame->width != hsv_img_->width )
-      {
-        ROS_WARN( "resizing images to: [%d,%d]", cvGetSize(frame).width, cvGetSize(frame).height );
-        //resize images
-        cvReleaseImage( &hsv_img_ );
-        cvReleaseImage( &disp_ );
-        hsv_img_ = cvCreateImage( cvGetSize(frame), 8, 3 );
-        disp_ = cvCreateImage( cvGetSize(frame), 8, 3 );
-      }
-      cvCopy( frame, disp_ );
-      cvCvtColor( frame, hsv_img_, CV_BGR2HSV );
-      
-      // color finders
-      int c = 0;
-      for( vector<ColorFinder>::iterator i = color_finders_.begin();
-            i != color_finders_.end(); i++ )
-      {
-        // color probability images
-        i->image_cb( hsv_img_ );
-        // find contours
-        i->find_blobs(img_msg.header.stamp);
-        // publish blobs
-
-        // render blobs
-        vector<oit_msgs::Blob> blobs = i->get_blobs();
-        for( unsigned int j = 0; j < blobs.size(); j++ )
-        {
-          oit_msgs::Blob b = blobs[j];
-          cvRectangle( disp_, cvPoint( b.x, b.y ), 
-                              cvPoint( b.x+b.width, b.y+b.height ),
-                              colors_[c], 1 );         
-        }
-        c++;
-      }
-
-      // robot detector
-
-			/*
-        // contours
-
-      cvErode( foreground_thresh_, foreground_thresh_, NULL, 2 );
-      cvDilate( foreground_thresh_, foreground_thresh_, NULL, 2 );
-      //cvDilate( foreground_thresh_, foreground_thresh_, kernel_, 1 );
-      cvCvtScale( foreground_thresh_, foreground_mask_, 1, 0 );
-      cvZero( foreground_ );
-      cvCopy( frame, foreground_, foreground_mask_ );
-      //cvShowImage( "foreground", foreground_ );
-
-      CvSeq* contour = 0;
-      cvFindContours( foreground_mask_, storage_, &contour, sizeof(CvContour), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-      cvClearMemStorage( storage_ );
-
-      CvRect bb;
-      oit_msgs::BlobArray blobs;
-      for( ; contour != 0; contour = contour->h_next )
-      {
-
-        cvDrawContours(disp_,contour,CV_RGB(0,255,0), CV_RGB(255,0,0), 0, 1, CV_AA, cvPoint(0,0));
-        bb = cvBoundingRect(contour, 1 );
-        oit_msgs::Blob b;
-        b.x = bb.x;
-        b.y = bb.y;
-        b.width = bb.width;
-        b.height = bb.height;
-        cvRectangle( disp_, cvPoint( b.x, b.y ),
-                            cvPoint( b.x+b.width, b.y+b.height ),
-                            CV_RGB(255,0,0), 1 );
-        blobs.blobs.push_back(b);
-      }
-
-      foreground_pub.publish( blobs );
-        // undo robot contour
-        // undo child contour
-      */
-
-      // TODO: fill for foreground color
-      if( display > 0 )
-      {
-        cvShowImage( "output", disp_ );
-        cvWaitKey(10);
-      }
+    cv_bridge::CvImagePtr cv_ptr;
+    /* get frame */
+    try {
+      cv_ptr = cv_bridge::toCvCopy( img_msg, sensor_msgs::image_encodings::BGR8 );
     }
-    else
+    catch( cv_bridge::Exception &e ) 
     {
-      ROS_WARN( "img_bridge could not parse image" );
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+      return;
+    }
+  
+    cv::Mat frame = cv_ptr->image;
+    ros::Time img_time = msg->header.stamp;
+    
+    if( frame->rows != hsv_img_->rows )
+    {
+      ROS_WARN( "resizing images to: [%d,%d]", cvGetSize(frame).width, cvGetSize(frame).height );
+      //resize images
+      cvReleaseImage( &hsv_img_ );
+      cvReleaseImage( &disp_ );
+      hsv_img_ = cvCreateImage( cvGetSize(frame), 8, 3 );
+      disp_ = cvCreateImage( cvGetSize(frame), 8, 3 );
+    }
+    cvCopy( frame, disp_ );
+    cvCvtColor( frame, hsv_img_, CV_BGR2HSV );
+      
+    // color finders
+    int c = 0;
+    for( vector<ColorFinder>::iterator i = color_finders_.begin();
+         i != color_finders_.end(); i++ )
+    {
+      // color probability images
+      i->image_cb( hsv_img_ );
+      // find contours
+      i->find_blobs(img_msg.header.stamp);
+      // publish blobs
+
+      // render blobs
+      vector<oit_msgs::Blob> blobs = i->get_blobs();
+      for( unsigned int j = 0; j < blobs.size(); j++ )
+      {
+        oit_msgs::Blob b = blobs[j];
+        cvRectangle( disp_, cvPoint( b.x, b.y ), 
+                            cvPoint( b.x+b.width, b.y+b.height ),
+                            colors_[c], 1 );         
+      }
+      c++;
+    }
+
+    // TODO: fill for foreground color
+    if( display > 0 )
+    {
+      cvShowImage( "output", disp_ );
+      cvWaitKey(10);
     }
   }
 
