@@ -39,6 +39,10 @@ Run the following (one new terminal per command):
  rosrun vision_manip_pipeline jb_conv_coord_server
  rosrun vision_manip_pipeline jb_get_grasp_server.py 
  rosrun vision_manip_pipeline jb_pub_workspace_corners_server.py 
- rosrun vision_manip_pipeline jb_vision_manip_pipeline.py <object>
+ rosrun vision_manip_pipeline jb_vision_manip_pipeline_server
+
+For testing purposes to make sure the vision manip pipeline is working, run the following:
+
+ rosrun vision_manip_pipeline jb_vision_manip_pipeline_client <object>
  
  
