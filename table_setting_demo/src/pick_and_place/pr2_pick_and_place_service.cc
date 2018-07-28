@@ -152,14 +152,24 @@ PickPlace::PickPlace(std::string arm) : arm_group_{"right_arm"}  {
     // //"bowl",
     // //"soda",
     // // "wineglass"
-  "bird",
-  // "orange",
-  "apple",
-  "clock",
-  // "bottle",
-  "scissors",
-  "cup",
-  // "bowl"
+    
+    // // DARS DEMO
+    // "bird",
+    // // "orange",
+    // "sports_ball",
+    // "clock",
+    // // "bottle",
+    // "scissors",
+    // "cup",
+    // // "bowl",
+
+    // REU
+    "green_leg",
+    "blue_leg",
+    "yellow_bar",
+    "pink_bar",
+    "spotted_top",
+    "solid_top"
   };
   objects_ = std::vector<std::string>(object_str,
     object_str + sizeof(object_str) / sizeof(char*));
