@@ -169,9 +169,9 @@ int main(int argc, char *argv[]) {
             // printf("\ttask_net::AND %d\n",task_net::AND);
             break;
           case task_net::BEHAVIOR_VM:
-            // ROS_INFO("Children Size: %lu", children_param.size());
+            ROS_INFO("Children Size: %lu", children_param.size());
             object = name_param.topic.c_str();
-           // get the name of the object of corresponding node:
+            // get the name of the object of corresponding node:
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
             // set up network for corresponding node:
             ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
