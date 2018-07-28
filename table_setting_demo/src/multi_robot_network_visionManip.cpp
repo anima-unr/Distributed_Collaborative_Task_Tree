@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   task_net::NodeId_t parent_param;
   NodeParam nodes;
   std::string object;
-  std::string obj_name;
+  std::string obj_name, loc_obj, off_x, off_y, off_z;
   std::vector<float> neutral_object_pos;
   std::vector<float> object_pos;
   
