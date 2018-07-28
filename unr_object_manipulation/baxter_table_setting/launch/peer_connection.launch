@@ -1,6 +1,6 @@
 <launch>
     <node name="PR2_interface" pkg="unr_object_manipulation" type="peer_connection_interface.py" output="screen">
-    	<rosparam file="$(find table_task_sim)/config/DARS_test.yaml"/>
+    	<rosparam file="$(find table_setting_demo)/params/NodeDescription.yaml"/>
         <param name="robot" value="PR2"/>
         <param name="pub_port" value="5566"/>
         <param name="sub_port" value="5565"/>

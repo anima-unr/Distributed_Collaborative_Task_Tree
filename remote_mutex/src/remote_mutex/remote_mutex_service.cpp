@@ -65,7 +65,7 @@ class RemoteMutexService {
   robotics_task_tree_msgs::State top_level_state_;
 
   explicit RemoteMutexService(const char* name)
-      : record_object("/home/anima/catkin_workspace/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
+      : record_object("/home/nataliereu/catkin_ws/src/Distributed_Collaborative_Task_Tree/Data/remote_mutex.csv",
         100) {
     locked = false;
     owner = "";
@@ -75,7 +75,11 @@ class RemoteMutexService {
       &RemoteMutexService::MutexRequest,
       this);
 
-    ns.param<std::string>( "/topic", root_topic_, "AND_2_0_006_state");
+    //ns.param<std::string>( "/topic", root_topic_, "AND_2_0_006_state");
+	ns.getParam("/root_topic", root_topic_);
+	
+	std::cout << "root_topic_: " << root_topic_ << "\n";
+
     ns.param<int>( "/enum_robot", enum_robot_, 0);
     state_subscriber_ = ns.subscribe(root_topic_, 1000, &RemoteMutexService::RootStateCallback, this );
 
