@@ -40,7 +40,7 @@ class ColorFinder
 {
   ros::Publisher blobs_pub;
   ros::Publisher world_pub;
-  IplImage *backproject_img_, *mask_, *hue_;
+  cv::Mat backproject_img_, mask_, hue_;
 
   //oit_msgs::BlobArray blobs_;
 
@@ -48,20 +48,24 @@ class ColorFinder
   std::string color_histfile_;
   int smin_, vmin_, vmax_, hdims_;
   int min_area_;
-  CvHistogram *hist_;
-  CvMemStorage* storage_;
-  IplConvKernel *kernel_;
+  cv::Mat hist_;
+  std::vector<cv::Vec4i> storage_;
+  float hranges_arr[2];
+  const float* hranges;
+
+  //IplConvKernel *kernel_;
 
   public:
+    ColorFinder();
     void init( std::string, std::string, int min_area = 5 );
-    void image_cb( IplImage* img );
+    void image_cb( cv::Mat img );
     void find_blobs(ros::Time t);
 
 		int* smin() {return &smin_;}
 		int* vmax() {return &vmax_;}
 		int* vmin() {return &vmin_;}
 
-    std::vector<oit_msgs::Blob> get_blobs() { return blobs_.blobs; }
+    //std::vector<oit_msgs::Blob> get_blobs() { return blobs_.blobs; }
     
 };
 

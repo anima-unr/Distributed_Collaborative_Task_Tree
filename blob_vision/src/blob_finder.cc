@@ -53,16 +53,15 @@ class ImageSplitter
     ros::Publisher hsv_pub;
     ros::Publisher foreground_pub;
 
-    sensor_msgs::CvBridge img_bridge_;
     sensor_msgs::Image img_;
-    IplImage *hsv_img_, *disp_;
+    cv::Mat hsv_img_, disp_;
     bool first;
     int display;
 
-    IplConvKernel *kernel_;
-    CvMemStorage* storage_;
+    //IplConvKernel *kernel_;
+    std::vector<cv::Vec4i> storage_;
     vector<ColorFinder> color_finders_;
-    vector<CvScalar> colors_;
+    vector<cv::Scalar> colors_;
 
     //int vmin, vmax, smin;
   public:
@@ -72,7 +71,7 @@ class ImageSplitter
     cv_bridge::CvImagePtr cv_ptr;
     /* get frame */
     try {
-      cv_ptr = cv_bridge::toCvCopy( img_msg, sensor_msgs::image_encodings::BGR8 );
+      cv_ptr = cv_bridge::toCvCopy( msg, sensor_msgs::image_encodings::BGR8 );
     }
     catch( cv_bridge::Exception &e ) 
     {
@@ -83,17 +82,15 @@ class ImageSplitter
     cv::Mat frame = cv_ptr->image;
     ros::Time img_time = msg->header.stamp;
     
-    if( frame->rows != hsv_img_->rows )
+    if( frame.rows != hsv_img_.rows )
     {
-      ROS_WARN( "resizing images to: [%d,%d]", cvGetSize(frame).width, cvGetSize(frame).height );
+      ROS_WARN( "resizing images to: [%d,%d]", frame.rows, frame.cols );
       //resize images
-      cvReleaseImage( &hsv_img_ );
-      cvReleaseImage( &disp_ );
-      hsv_img_ = cvCreateImage( cvGetSize(frame), 8, 3 );
-      disp_ = cvCreateImage( cvGetSize(frame), 8, 3 );
+      hsv_img_.create(cv::Size(frame.rows,frame.cols), CV_8UC3 );
+      disp_.create(cv::Size(frame.rows,frame.cols), CV_8UC3 );
     }
-    cvCopy( frame, disp_ );
-    cvCvtColor( frame, hsv_img_, CV_BGR2HSV );
+    disp_ = frame.clone();
+    cv::cvtColor( frame, hsv_img_, CV_BGR2HSV );
       
     // color finders
     int c = 0;
@@ -103,33 +100,36 @@ class ImageSplitter
       // color probability images
       i->image_cb( hsv_img_ );
       // find contours
-      i->find_blobs(img_msg.header.stamp);
+      i->find_blobs(msg->header.stamp);
       // publish blobs
 
       // render blobs
-      vector<oit_msgs::Blob> blobs = i->get_blobs();
+      //vector<oit_msgs::Blob> blobs = i->get_blobs();
+      /*
       for( unsigned int j = 0; j < blobs.size(); j++ )
       {
+
         oit_msgs::Blob b = blobs[j];
         cvRectangle( disp_, cvPoint( b.x, b.y ), 
                             cvPoint( b.x+b.width, b.y+b.height ),
                             colors_[c], 1 );         
       }
+      */
       c++;
     }
 
     // TODO: fill for foreground color
     if( display > 0 )
     {
-      cvShowImage( "output", disp_ );
-      cvWaitKey(10);
+      cv::imshow( "output", disp_ );
+      cv::waitKey(10);
     }
   }
 
   void init()
   {
     //hsv_pub = n.advertise<sensor_msgs::Image>("image_hsv",1000);
-    foreground_pub = n.advertise<oit_msgs::BlobArray>("foreground_blobs",1000);
+    //foreground_pub = n.advertise<oit_msgs::BlobArray>("foreground_blobs",1000);
     n = ros::NodeHandle("~");
     std::string colorfile, irfile, childfile;
     n.param("parent_hist", colorfile, std::string(""));
@@ -177,8 +177,8 @@ class ImageSplitter
 			cvCreateTrackbar( "Smin", "output", color_finders_[1].smin(), 256, 0);
     }
 
-    kernel_ = cvCreateStructuringElementEx( 15, 15, 8, 8, CV_SHAPE_RECT );
-    storage_ = cvCreateMemStorage(0);
+    //kernel_ = cvCreateStructuringElementEx( 15, 15, 8, 8, CV_SHAPE_RECT );
+    //storage_ = cvCreateMemStorage(0);
 
 		first = true;
   }

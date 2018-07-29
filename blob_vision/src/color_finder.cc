@@ -30,30 +30,49 @@
 
 
 #include "ros/ros.h"
-#include "color_finder.h"
-
+#include "blob_vision/color_finder.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/core/types_c.h"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
+ColorFinder::ColorFinder()
+{
+  hranges_arr[0] = 0;
+  hranges_arr[1] = 1;
+  hranges = hranges_arr;
+}
 
 void 
-ColorFinder::image_cb( IplImage* hsv )
+ColorFinder::image_cb( cv::Mat hsv )
 {
-  if( hsv->width != mask_->width )
+  if( hsv.cols != mask_.cols )
   {
-    CvSize s = cvGetSize( hsv );
-    hue_ = cvCreateImage( s, 8, 1 );
-    mask_ = cvCreateImage( s, 8, 1 );
-    backproject_img_ = cvCreateImage( s, 8, 1 );
+    hue_.create( hsv.rows,hsv.cols, CV_8UC1 );
+    mask_.create( hsv.rows,hsv.cols, CV_8UC1 );
+    backproject_img_.create( hsv.rows,hsv.cols, CV_8UC1 );
   }
 
-  cvInRangeS( hsv, cvScalar(0,smin_,MIN(vmin_,vmax_),0),
-              cvScalar(180,256,MAX(vmax_,vmin_),0),mask_);
-      
-  cvSplit( hsv, hue_, 0, 0, 0 );
-  cvCalcBackProject( &hue_, backproject_img_, hist_ );
-  cvAnd( backproject_img_, mask_, backproject_img_, 0 );
-  cvDilate( backproject_img_, backproject_img_, NULL, 2 );
-  cvErode( backproject_img_, backproject_img_, NULL, 2 );
+  cv::inRange( hsv, cv::Scalar(0,smin_,MIN(vmin_,vmax_),0),
+              cv::Scalar(180,256,MAX(vmax_,vmin_),0),mask_);
+  
+  hue_.create(hsv.size(), hsv.depth());
+  int ch[] = {0,0};
+  cv::mixChannels( &hsv, 1, &hue_, 1, ch, 1);
+
+  cv::calcBackProject( &hue_, 1, 0, hist_, backproject_img_, &hranges );
+  backproject_img_ &= mask_;
+
+  int erosion_type = cv::MORPH_RECT;
+  int erosion_size = 2;
+  cv::Mat element = cv::getStructuringElement( erosion_type,
+                                               cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                                               cv::Point( erosion_size, erosion_size ) );
+
+
+  cv::dilate( backproject_img_, backproject_img_, element );
+  cv::erode( backproject_img_, backproject_img_, element );
   //cvDilate( backproject_img_, backproject_img_, kernel_, 1 );
 
   //cvShowImage( color_histfile_.c_str(), backproject_img_ );
@@ -64,23 +83,22 @@ ColorFinder::image_cb( IplImage* hsv )
 void
 ColorFinder::find_blobs( ros::Time t )
 {
-  CvSeq* c = 0;
-  cvFindContours( backproject_img_, storage_, &c, sizeof(CvContour), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-  cvClearMemStorage( storage_ );
+  std::vector< std::vector<cv::Point> > contours;
 
-  blobs_.blobs.resize(0);
+  cv::findContours( backproject_img_, contours, storage_, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+
+  //blobs_.blobs.resize(0);
 
   // for each contour
-  for( ; c != 0; c = c->h_next )
+  for( int i = 0; i >=0; i = storage_[i][0] )
   {
     // if above size threshold
-    double area = fabs( cvContourArea( c, CV_WHOLE_SEQ ));
+    double area = fabs( cv::contourArea( storage_[i] ) );
     if( area > min_area_ )
     {
       //bounding box
-      CvRect bb = cvBoundingRect( c, 1 );
-
-
+      cv::Rect bb = cv::boundingRect( storage_[i] );
+/*
       oit_msgs::Blob b;
       b.x = bb.x;
       b.y = bb.y;
@@ -90,10 +108,12 @@ ColorFinder::find_blobs( ros::Time t )
 
       // add to blob list
       blobs_.blobs.push_back( b );
+*/
+      printf( "(%d,%d) [%d, %d]: %0.2f\n", bb.x, bb.y, bb.width, bb.height, area);
     }
   }
-  blobs_.header.stamp = t;
-  blobs_pub.publish( blobs_ );
+  //blobs_.header.stamp = t;
+  //blobs_pub.publish( blobs_ );
 }
 
 void 
@@ -111,26 +131,24 @@ ColorFinder::init( std::string color_file, std::string name, int min_area )
     fscanf( hist_dump, "%d\n", &vmin_ );
     fscanf( hist_dump, "%d\n", &vmax_ );
     float* hranges = new float[2];
-    hranges[0] = 0;
-    hranges[1] = 180;
-    hist_ = cvCreateHist( 1, &hdims_, CV_HIST_ARRAY, &hranges, 1 );
+    hist_.create(1, hdims_, CV_32FC1 );
     float x = 0.0;
     for( int i = 0; i < hdims_; i++ )
     {
       fscanf( hist_dump, "%f\n", &x );
-      cvSetReal1D( hist_->bins, i, x );
+      hist_.at<float>(0,i) = x;
     }
     fclose( hist_dump );
 
-    storage_ = cvCreateMemStorage(0);
+    //storage_ = cvCreateMemStorage(0);
     mask_ = cvCreateImage( cvSize(1,1),8,1);
 
     // read in kernel size
     int kernel_size = 5;
 
-    kernel_ = cvCreateStructuringElementEx( kernel_size, kernel_size, 
-                                            kernel_size/2, kernel_size/2, 
-                                            CV_SHAPE_RECT );
+    //kernel_ = cvCreateStructuringElementEx( kernel_size, kernel_size, 
+    //                                       kernel_size/2, kernel_size/2, 
+    //                                       CV_SHAPE_RECT );
 
     //cvNamedWindow( color_histfile_.c_str(), 1 );
 
@@ -138,7 +156,7 @@ ColorFinder::init( std::string color_file, std::string name, int min_area )
     ros::NodeHandle n;
     std::string pub_name = name + "_blobs";
     std::string world_name = name + "_world";
-    blobs_pub = n.advertise<oit_msgs::BlobArray>( pub_name, 1000 );
+    //blobs_pub = n.advertise<oit_msgs::BlobArray>( pub_name, 1000 );
 
 
   }
