@@ -84,7 +84,7 @@ class ImageSplitter
     
     if( frame.rows != hsv_img_.rows )
     {
-      ROS_WARN( "resizing images to: [%d,%d]", frame.rows, frame.cols );
+      ROS_WARN( "resizing images to: [%d,%d]", frame.cols, frame.rows );
       //resize images
       hsv_img_.create(cv::Size(frame.rows,frame.cols), CV_8UC3 );
       disp_.create(cv::Size(frame.rows,frame.cols), CV_8UC3 );

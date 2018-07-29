@@ -39,19 +39,70 @@
 
 ColorFinder::ColorFinder()
 {
+  /*
   hranges_arr[0] = 0;
   hranges_arr[1] = 1;
   hranges = hranges_arr;
+  */
+}
+
+void
+ColorFinder::read_file()
+{
+  printf( "read file: [%s]\n", color_histfile_.c_str() );
+  // create histogram; read in hdims
+  FILE* hist_dump = fopen( color_histfile_.c_str(), "r" );
+  fscanf( hist_dump, "%d\n", &hdims_ );
+  fscanf( hist_dump, "%d\n", &smin_ );
+  fscanf( hist_dump, "%d\n", &vmin_ );
+  fscanf( hist_dump, "%d\n", &vmax_ );
+  printf( "hist read: [%d,%d] [%d,%lu]\n", hist_.cols, hist_.rows, hist_.type(), hist_.elemSize() );
+
+  float x = 0.0;
+
+  for( int i = 0; i < hdims_; i++ )
+  {
+    fscanf( hist_dump, "%f\n", &x );
+    printf( "%f\n", x);
+    hist_.at<float>(i) = x;
+  }
+  cv::normalize(hist_, hist_, 0, 255, cv::NORM_MINMAX);
+  fclose( hist_dump );
 }
 
 void 
 ColorFinder::image_cb( cv::Mat hsv )
 {
+  float hranges_arr[] = {0,1};
+  const float* hranges = hranges_arr;
+
+
+  ROS_INFO("[%s]: image_cb", color_histfile_.c_str() );
   if( hsv.cols != mask_.cols )
   {
-    hue_.create( hsv.rows,hsv.cols, CV_8UC1 );
-    mask_.create( hsv.rows,hsv.cols, CV_8UC1 );
+    hue_.create(hsv.size(), hsv.depth());
+    //hist_.create(hdims_, 1, 5);
+    mask_.create( hsv.size(), CV_8UC1 );
     backproject_img_.create( hsv.rows,hsv.cols, CV_8UC1 );
+
+    cv::Rect selection;
+    selection.x = 1;
+    selection.y = 1;
+    selection.width = 5;
+    selection.height = 5;
+    cv::inRange( hsv, cv::Scalar(0,smin_,MIN(vmin_,vmax_),0),
+                 cv::Scalar(180,256,MAX(vmax_,vmin_),0),mask_);
+    
+    hue_.create(hsv.size(), hsv.depth());
+    int ch[] = {0,0};
+    cv::mixChannels( &hsv, 1, &hue_, 1, ch, 1);
+
+    cv::Mat roi( hue_, selection ), maskroi(mask_, selection);
+    printf( "about to read hist [%d]\n", hdims_);
+    printf( "hist not read: [%d,%d] [%d,%lu]\n", hue_.cols, hue_.rows, hue_.type(), hue_.elemSize() );
+    cv::calcHist( &roi, 1, 0, maskroi, hist_, 1, &hdims_, &hranges );
+    read_file();
+    cv::normalize(hist_, hist_, 0, 255, cv::NORM_MINMAX);
   }
 
   cv::inRange( hsv, cv::Scalar(0,smin_,MIN(vmin_,vmax_),0),
@@ -65,39 +116,50 @@ ColorFinder::image_cb( cv::Mat hsv )
   backproject_img_ &= mask_;
 
   int erosion_type = cv::MORPH_RECT;
-  int erosion_size = 2;
+  int erosion_size = 3;
   cv::Mat element = cv::getStructuringElement( erosion_type,
                                                cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),
                                                cv::Point( erosion_size, erosion_size ) );
 
 
-  cv::dilate( backproject_img_, backproject_img_, element );
-  cv::erode( backproject_img_, backproject_img_, element );
+  cv::Mat dilate_dst;
+  dilate_dst.create(hsv.size(), hsv.depth());
+  cv::dilate( backproject_img_, dilate_dst, element );
+  cv::Mat erode_dst;
+  erode_dst.create(hsv.size(), hsv.depth());
+  cv::erode( dilate_dst, erode_dst, element );
+
+  element = cv::getStructuringElement( erosion_type,
+                                               cv::Size( 2*erosion_size + 5, 2*erosion_size+5 ),
+                                               cv::Point( erosion_size, erosion_size ) );
+
+  cv::dilate( erode_dst, backproject_img_, element );
   //cvDilate( backproject_img_, backproject_img_, kernel_, 1 );
 
-  //cvShowImage( color_histfile_.c_str(), backproject_img_ );
-  //cvWaitKey(10);
+  cv::imshow( color_histfile_.c_str(), backproject_img_ );
+  cv::waitKey(10);
 
 }
 
 void
 ColorFinder::find_blobs( ros::Time t )
 {
+  ROS_INFO("[%s]: find_blobs", color_histfile_.c_str() );
   std::vector< std::vector<cv::Point> > contours;
-
-  cv::findContours( backproject_img_, contours, storage_, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+  storage_.clear();
+  cv::findContours( backproject_img_, contours, storage_, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE );
 
   //blobs_.blobs.resize(0);
 
   // for each contour
-  for( int i = 0; i >=0; i = storage_[i][0] )
+  for( int i = 0; i < contours.size(); i++ )
   {
     // if above size threshold
-    double area = fabs( cv::contourArea( storage_[i] ) );
+    double area = fabs( cv::contourArea( contours[i] ) );
     if( area > min_area_ )
     {
       //bounding box
-      cv::Rect bb = cv::boundingRect( storage_[i] );
+      cv::Rect bb = cv::boundingRect( contours[i] );
 /*
       oit_msgs::Blob b;
       b.x = bb.x;
@@ -118,46 +180,33 @@ ColorFinder::find_blobs( ros::Time t )
 
 void 
 ColorFinder::init( std::string color_file, std::string name, int min_area )
-  {
+{
 
-    color_histfile_ = color_file;
-    min_area_ = min_area;
-    printf( "filename: [%s]\n", color_histfile_.c_str() );
+  color_histfile_ = color_file;
+  min_area_ = min_area;
+  printf( "filename: [%s]\n", color_histfile_.c_str() );
+  FILE* hist_dump = fopen( color_file.c_str(), "r" );
+  fscanf( hist_dump, "%d\n", &hdims_ );
+  fscanf( hist_dump, "%d\n", &smin_ );
+  fscanf( hist_dump, "%d\n", &vmin_ );
+  fscanf( hist_dump, "%d\n", &vmax_ );
+  fclose( hist_dump);
+  //storage_ = cvCreateMemStorage(0);
+  //mask_ = cvCreateImage( cvSize(1,1),8,1);
 
-    // create histogram; read in hdims
-    FILE* hist_dump = fopen( color_file.c_str(), "r" );
-    fscanf( hist_dump, "%d\n", &hdims_ );
-    fscanf( hist_dump, "%d\n", &smin_ );
-    fscanf( hist_dump, "%d\n", &vmin_ );
-    fscanf( hist_dump, "%d\n", &vmax_ );
-    float* hranges = new float[2];
-    hist_.create(1, hdims_, CV_32FC1 );
-    float x = 0.0;
-    for( int i = 0; i < hdims_; i++ )
-    {
-      fscanf( hist_dump, "%f\n", &x );
-      hist_.at<float>(0,i) = x;
-    }
-    fclose( hist_dump );
+  // read in kernel size
+  int kernel_size = 5;
 
-    //storage_ = cvCreateMemStorage(0);
-    mask_ = cvCreateImage( cvSize(1,1),8,1);
+  //kernel_ = cvCreateStructuringElementEx( kernel_size, kernel_size, 
+  //                                       kernel_size/2, kernel_size/2, 
+  //                                       CV_SHAPE_RECT );
 
-    // read in kernel size
-    int kernel_size = 5;
+  //cvNamedWindow( color_histfile_.c_str(), 1 );
 
-    //kernel_ = cvCreateStructuringElementEx( kernel_size, kernel_size, 
-    //                                       kernel_size/2, kernel_size/2, 
-    //                                       CV_SHAPE_RECT );
-
-    //cvNamedWindow( color_histfile_.c_str(), 1 );
-
-    // declare publisher
-    ros::NodeHandle n;
-    std::string pub_name = name + "_blobs";
-    std::string world_name = name + "_world";
-    //blobs_pub = n.advertise<oit_msgs::BlobArray>( pub_name, 1000 );
-
-
-  }
+  // declare publisher
+  ros::NodeHandle n;
+  std::string pub_name = name + "_blobs";
+  std::string world_name = name + "_world";
+  //blobs_pub = n.advertise<oit_msgs::BlobArray>( pub_name, 1000 );
+}
 

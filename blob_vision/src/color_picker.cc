@@ -224,7 +224,7 @@ void image_cb( const sensor_msgs::ImageConstPtr& img_msg )
                      color, -1, 8, 0 );
         */
       }
-		  printf( "hist dump\n" );
+		  printf( "hist dump: [%d,%d] [%d,%d]\n", hist.cols, hist.rows, hist.type(), hist.elemSize() );
     }
 
     cv::calcBackProject( &hue, 1, 0, hist, backproject, &hranges );

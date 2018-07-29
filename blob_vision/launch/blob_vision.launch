@@ -1,0 +1,6 @@
+<launch>
+	<node pkg="blob_vision" type="color_finder_node" name="blob_finder" output="screen">
+		<param name="child_hist" type="str" value="/home/dfseifer/2018-07-28-23-37-58-dump.txt"/>
+		<remap from="image_raw" to="/camera/rgb/image_raw"/>
+	</node>
+</launch>

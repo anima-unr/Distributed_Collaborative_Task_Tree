@@ -50,14 +50,13 @@ class ColorFinder
   int min_area_;
   cv::Mat hist_;
   std::vector<cv::Vec4i> storage_;
-  float hranges_arr[2];
-  const float* hranges;
 
   //IplConvKernel *kernel_;
 
   public:
     ColorFinder();
-    void init( std::string, std::string, int min_area = 5 );
+    void read_file();
+    void init( std::string, std::string, int min_area = 10 );
     void image_cb( cv::Mat img );
     void find_blobs(ros::Time t);
 
