@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   tf
+  vision_manip_pipeline
 )
 
 ## System dependencies are found with CMake's conventions
@@ -71,10 +72,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   sensor_msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   sensor_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES blob_vision
-  CATKIN_DEPENDS cv_bridge image_geometry image_transport roscpp sensor_msgs tf
+  CATKIN_DEPENDS cv_bridge image_geometry image_transport roscpp sensor_msgs tf vision_manip_pipeline
 #  DEPENDS system_lib
 )
 

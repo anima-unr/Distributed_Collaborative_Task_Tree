@@ -36,6 +36,7 @@
 #include "sensor_msgs/Image.h"
 #include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/fill_image.h"
+#include "vision_manip_pipeline/GetObjLoc.h"
 
 #include "blob_vision/color_finder.h"
 
@@ -59,9 +60,23 @@ class ImageSplitter
     vector<ColorFinder> color_finders_;
     vector<cv::Scalar> colors_;
     vector<string> color_hist_files_;
-
+    vector<string> color_names_;
+    map<string,Blob> current_location_;
     //int vmin, vmax, smin;
   public:
+
+  bool blob_lookup( vision_manip_pipeline::GetObjLoc::Request  &req,
+                    vision_manip_pipeline::GetObjLoc::Response &res)
+  {
+    Blob b = current_location_[req.obj_name];
+    res.Class = req.obj_name;
+    res.probability = 1;
+    res.xmin = b.x;
+    res.ymin = b.y;
+    res.xmax = b.x+b.width;
+    res.ymax = b.y+b.height;
+    return true;
+  }
 
   void image_cb( const sensor_msgs::ImageConstPtr& msg )
   {
@@ -118,6 +133,7 @@ class ImageSplitter
         cv::rectangle( disp_, cv::Point( b.x, b.y ), 
                               cv::Point( b.x+b.width, b.y+b.height ),
                               colors_[i], 1 );
+        current_location_[color_names_[i]] = b;
       }
 
     }
@@ -140,6 +156,8 @@ class ImageSplitter
 
     color_hist_files_.clear();
     n.getParam("histfiles", color_hist_files_);
+    color_names_.clear();
+    n.getParam("color_names", color_names_);
 
     colors_.push_back( CV_RGB( 128, 0, 255 ) );
     colors_.push_back( CV_RGB( 255, 128, 0 ) );
@@ -151,10 +169,10 @@ class ImageSplitter
     for( int i = 0; i < color_hist_files_.size(); i++ )
     {
       std::string colorfilename = colordir + std::string("/") + color_hist_files_[i];
-      ROS_DEBUG( "creating color finder: [%s]", colorfilename.c_str() );
+      ROS_DEBUG( "creating color finder: [%s:%s]", color_names_[i].c_str(), colorfilename.c_str() );
       ColorFinder p;
-      p.init( colorfilename.c_str(), color_hist_files_[i] );
-      color_finders_.push_back( p );
+      if( p.init( colorfilename.c_str(), color_hist_files_[i] ) == 0 )
+        color_finders_.push_back( p );
     }
 
     n.param( "display", display, 1 );
@@ -179,6 +197,8 @@ int main( int argc, char* argv[] )
 	ros::NodeHandle nh;
 	image_transport::ImageTransport it(nh);
   image_transport::Subscriber image_sub = it.subscribe("image_raw", 1, &ImageSplitter::image_cb, foo_object );
+  ros::ServiceServer service = nh.advertiseService("return_blobs", &ImageSplitter::blob_lookup, foo_object);
+
   i->init();
   ros::spin();
   ROS_INFO( "image_splitter quitting..." );

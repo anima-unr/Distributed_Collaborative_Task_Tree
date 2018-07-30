@@ -60,7 +60,7 @@ class ColorFinder
   public:
     ColorFinder();
     void read_file();
-    void init( std::string, std::string, int min_area = 10 );
+    int init( std::string, std::string, int min_area = 10 );
     void image_cb( cv::Mat img );
     void find_blobs(ros::Time t);
 

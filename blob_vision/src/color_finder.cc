@@ -190,14 +190,19 @@ ColorFinder::find_blobs( ros::Time t )
   //blobs_pub.publish( blobs_ );
 }
 
-void 
+int 
 ColorFinder::init( std::string color_file, std::string name, int min_area )
 {
 
   color_histfile_ = color_file;
   min_area_ = min_area;
-  ROS_INFO( "filename: [%s]\n", color_histfile_.c_str() );
+  ROS_DEBUG( "filename: [%s]", color_histfile_.c_str() );
   FILE* hist_dump = fopen( color_file.c_str(), "r" );
+  if( hist_dump == NULL )
+  {
+    ROS_ERROR("filename: [%s] did not open, skipping this color", color_histfile_.c_str());
+    return -1;
+  }
   fscanf( hist_dump, "%d\n", &hdims_ );
   fscanf( hist_dump, "%d\n", &smin_ );
   fscanf( hist_dump, "%d\n", &vmin_ );
@@ -211,5 +216,6 @@ ColorFinder::init( std::string color_file, std::string name, int min_area )
   ros::NodeHandle n;
   std::string pub_name = name + "_blobs";
   std::string world_name = name + "_world";
+  return 0;
 }
 

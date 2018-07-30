@@ -4,7 +4,8 @@
 			(defaults to the colors dir in the blob_vision directory)
 			and the individual filenames will be in the histfiles array -->
 		<param name="color_dir" type="str" value="$(find blob_vision)/colors"/>
-    <rosparam param="histfiles"> ["dfs_purple.txt", "dfs_orange.txt", "dfs_green.txt"] </rosparam>
+		<rosparam param="histfiles"> ["dfs_purple.txt", "dfs_orange.txt", "dfs_green.txt"] </rosparam>
+	    <rosparam param="color_names"> ["purple", "orange", "green"] </rosparam>
 		<remap from="image_raw" to="/camera/rgb/image_raw"/>
 	</node>
 </launch>
