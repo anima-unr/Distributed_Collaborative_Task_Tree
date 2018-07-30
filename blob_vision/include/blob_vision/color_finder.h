@@ -34,14 +34,20 @@
 
 #include "ros/ros.h"
 #include "opencv2/core/core.hpp"
-//#include "oit_msgs/BlobArray.h"
+
+class Blob 
+{
+  public:
+    int x, y, width, height, size;
+};
 
 class ColorFinder
 {
   ros::Publisher blobs_pub;
   ros::Publisher world_pub;
-  cv::Mat backproject_img_, mask_, hue_;
+  cv::Mat backproject_img_, mask_, hue_, histimg_ = cv::Mat::zeros( 240, 360, CV_8UC3 );
 
+  std::vector<Blob> blobs_;
   //oit_msgs::BlobArray blobs_;
 
   // color histogram settings
@@ -50,8 +56,6 @@ class ColorFinder
   int min_area_;
   cv::Mat hist_;
   std::vector<cv::Vec4i> storage_;
-
-  //IplConvKernel *kernel_;
 
   public:
     ColorFinder();
@@ -64,7 +68,7 @@ class ColorFinder
 		int* vmax() {return &vmax_;}
 		int* vmin() {return &vmin_;}
 
-    //std::vector<oit_msgs::Blob> get_blobs() { return blobs_.blobs; }
+    std::vector<Blob> get_blobs() { return blobs_; }
     
 };
 

@@ -33,15 +33,11 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "image_transport/image_transport.h"
-//#include "image_geometry/pinhole_camera_model.h"
 #include "sensor_msgs/Image.h"
 #include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/fill_image.h"
 
-//#include "contour_fcns.h"
 #include "blob_vision/color_finder.h"
-
-//#include "ray.h"
 
 using namespace std;
 
@@ -62,6 +58,7 @@ class ImageSplitter
     std::vector<cv::Vec4i> storage_;
     vector<ColorFinder> color_finders_;
     vector<cv::Scalar> colors_;
+    vector<string> color_hist_files_;
 
     //int vmin, vmax, smin;
   public:
@@ -93,29 +90,36 @@ class ImageSplitter
     cv::cvtColor( frame, hsv_img_, CV_BGR2HSV );
       
     // color finders
-    int c = 0;
-    for( vector<ColorFinder>::iterator i = color_finders_.begin();
-         i != color_finders_.end(); i++ )
+    for( int i = 0; i < color_finders_.size(); i++ )
     {
       // color probability images
-      i->image_cb( hsv_img_ );
+      color_finders_[i].image_cb( hsv_img_ );
       // find contours
-      i->find_blobs(msg->header.stamp);
+      color_finders_[i].find_blobs(msg->header.stamp);
       // publish blobs
 
       // render blobs
-      //vector<oit_msgs::Blob> blobs = i->get_blobs();
-      /*
-      for( unsigned int j = 0; j < blobs.size(); j++ )
+      vector<Blob> blobs = color_finders_[i].get_blobs();
+      int idx = -1;
+      int ma = 0;
+      for( int j = 0; j < blobs.size(); j++ )
       {
+        //printf( "blobs[%u].size = %d <> %d (%u)\n", j, blobs[j].size, ma, idx );
+        if( blobs[j].size > ma )
+        {
+          idx = j;
+          ma = blobs[j].size;
+        }
+      }      
 
-        oit_msgs::Blob b = blobs[j];
-        cvRectangle( disp_, cvPoint( b.x, b.y ), 
-                            cvPoint( b.x+b.width, b.y+b.height ),
-                            colors_[c], 1 );         
+      if( idx > -1 )
+      {
+        Blob b = blobs[idx];
+        cv::rectangle( disp_, cv::Point( b.x, b.y ), 
+                              cv::Point( b.x+b.width, b.y+b.height ),
+                              colors_[i], 1 );
       }
-      */
-      c++;
+
     }
 
     // TODO: fill for foreground color
@@ -128,57 +132,36 @@ class ImageSplitter
 
   void init()
   {
-    //hsv_pub = n.advertise<sensor_msgs::Image>("image_hsv",1000);
-    //foreground_pub = n.advertise<oit_msgs::BlobArray>("foreground_blobs",1000);
     n = ros::NodeHandle("~");
-    std::string colorfile, irfile, childfile;
-    n.param("parent_hist", colorfile, std::string(""));
-    n.param("child_hist", childfile, std::string(""));
-    n.param("ir_hist", irfile, std::string(""));
-
     hsv_img_ = cvCreateImage( cvSize( 320,240), 8, 3 );
     disp_ = cvCreateImage( cvSize( 320,240), 8, 3 );
-    //foreground_img_ = cvCreateImage( cvSize( 320,240), 8, 1 );
+    std::string colordir;
+    n.param("color_dir", colordir, std::string(""));
 
-    // colors
-    color_finders_.clear();
-    
-    if( irfile != std::string("") )
-    {
-      ColorFinder c;
-      c.init( irfile.c_str(), "ir" );
-      color_finders_.push_back( c );
-      colors_.push_back( CV_RGB( 0, 0, 255 ) );
-    }
+    color_hist_files_.clear();
+    n.getParam("histfiles", color_hist_files_);
 
-		if( childfile != std::string( "" ) )
+    colors_.push_back( CV_RGB( 128, 0, 255 ) );
+    colors_.push_back( CV_RGB( 255, 128, 0 ) );
+    colors_.push_back( CV_RGB( 0, 128, 0 ) );
+    colors_.push_back( CV_RGB( 0, 0, 255 ) );
+    colors_.push_back( CV_RGB( 255, 0, 0 ) );
+    colors_.push_back( CV_RGB( 128, 255, 0 ) );
+
+    for( int i = 0; i < color_hist_files_.size(); i++ )
     {
+      std::string colorfilename = colordir + std::string("/") + color_hist_files_[i];
+      ROS_DEBUG( "creating color finder: [%s]", colorfilename.c_str() );
       ColorFinder p;
-      p.init( childfile.c_str(), "child" );
+      p.init( colorfilename.c_str(), color_hist_files_[i] );
       color_finders_.push_back( p );
-      colors_.push_back( CV_RGB( 255, 128, 0 ) );
     }
 
-    if( colorfile != std::string( "" ) )
-    {
-      ColorFinder p;
-      p.init( colorfile.c_str(), "parent" );
-      color_finders_.push_back( p );
-      colors_.push_back( CV_RGB( 128, 255, 0 ) );
-    }
-    //std::string background_file;
-    //n.param( "background", background_file, std::string("") );
     n.param( "display", display, 1 );
     if( display > 0 )
     {
       cvNamedWindow( "output", 1 );
-			cvCreateTrackbar( "Vmin", "output", color_finders_[1].vmin(), 256, 0);
-			cvCreateTrackbar( "Vmax", "output", color_finders_[1].vmax(), 256, 0);
-			cvCreateTrackbar( "Smin", "output", color_finders_[1].smin(), 256, 0);
     }
-
-    //kernel_ = cvCreateStructuringElementEx( 15, 15, 8, 8, CV_SHAPE_RECT );
-    //storage_ = cvCreateMemStorage(0);
 
 		first = true;
   }
