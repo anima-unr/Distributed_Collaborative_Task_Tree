@@ -46,7 +46,7 @@ class TableSetting {
     NodeParam nodes;
     task_net::State state;
     std::string object;
-    std::string obj_name;
+    std::string obj_name, loc_obj, off_x, off_y, off_z;
     std::vector<float> neutral_object_pos;
     std::vector<float> object_pos;
 
@@ -145,6 +145,10 @@ class TableSetting {
                                     "/right_arm_mutex",
                                     object_pos,
                                     neutral_object_pos,
+                                    loc_obj,
+                                    off_x,
+                                    off_y,
+                                    off_z,
                                     false);
 
           // if (object =="PLACE_3_0_010") {

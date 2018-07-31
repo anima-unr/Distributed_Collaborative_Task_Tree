@@ -152,7 +152,7 @@ PickPlace::PickPlace(std::string arm) : arm_group_{"right_arm"}  {
     // //"bowl",
     // //"soda",
     // // "wineglass"
-    
+
     // // DARS DEMO
     // "bird",
     // // "orange",
@@ -167,8 +167,8 @@ PickPlace::PickPlace(std::string arm) : arm_group_{"right_arm"}  {
     "green_leg",
     "blue_leg",
     "yellow_bar",
-    "pink_bar",
-    "spotted_top",
+    "magenta_bar",
+    "colorful_top",
     "solid_top"
   };
   objects_ = std::vector<std::string>(object_str,
@@ -240,6 +240,34 @@ void PickPlace::PickAndPlaceImpl_VisionManip(std::string object) {
   geometry_msgs::Pose place_pose_offset;
   if (stop)
     return;
+
+  // set the place position by reading from the param server!
+  // // get the location object name and it's location
+  // std::string loc_obj;
+  // ros::param::get("/" + object.c_str() + "/loc_obj", loc_obj);
+  // // todo: current loc? requires dynamic, for now do below instead....
+
+  // Assume everything is offset from the green_leg (due to current task) so get the location for that
+  geometry_msgs::Point place_green;
+  ros::param::get("/green_leg/off_x", place_green.x);
+  ros::param::get("/green_leg/off_y", place_green.y);
+  ros::param::get("/green_leg/off_z", place_green.z);
+
+  // get the offsets from the place location
+  geometry_msgs::Point place_offset;
+  ros::param::get(("/" + object + "/off_x" ).c_str(), place_offset.x);
+  ros::param::get(("/" + object + "/off_y").c_str(), place_offset.y);
+  ros::param::get(("/" + object + "/off_z").c_str(), place_offset.z);
+
+  // add the offsets to the location object location
+  geometry_msgs::Point place;
+  place.x = place_offset.x + place_green.x;
+  place.y = place_offset.y + place_green.y;
+  place.z = place_offset.z + place_green.z;
+
+  object_goal_map_[object.c_str()].place_pose.position = place;
+  // TODO: note: place_pose.orientation is assumed to be pretrained and read in from a file as before
+  //             (option p to save then v to read for pick server!!!)
 
   state_ = NEUTRAL;
   r_gripper_.Open();
@@ -447,7 +475,35 @@ void PickPlace::PickAndPlaceImpl(std::string object) {
   //TODO JB: object_goal_map_["neutral"].pick_pose.motion_plan_request.goal_constraints.position_constraints[0].header.stamp = ros::Time::now();
   // N/A?!  
 //------
-  
+
+  // set the place position by reading from the param server!
+  // // get the location object name and it's location
+  // std::string loc_obj;
+  // ros::param::get("/" + object.c_str() + "/loc_obj", loc_obj);
+  // // todo: current loc? requires dynamic, for now do below instead....
+
+  // Assume everything is offset from the green_leg (due to current task) so get the location for that
+  geometry_msgs::Point place_green;
+  ros::param::get("/green_leg/off_x", place_green.x);
+  ros::param::get("/green_leg/off_y", place_green.y);
+  ros::param::get("/green_leg/off_z", place_green.z);
+
+  // get the offsets from the place location
+  geometry_msgs::Point place_offset;
+  ros::param::get(("/" + object + "/off_x" ).c_str(), place_offset.x);
+  ros::param::get(("/" + object + "/off_y").c_str(), place_offset.y);
+  ros::param::get(("/" + object + "/off_z").c_str(), place_offset.z);
+
+  // add the offsets to the location object location
+  geometry_msgs::Point place;
+  place.x = place_offset.x + place_green.x;
+  place.y = place_offset.y + place_green.y;
+  place.z = place_offset.z + place_green.z;
+
+  object_goal_map_[object.c_str()].place_pose.position = place;
+  // TODO: note: place_pose.orientation is assumed to be pretrained and read in from a file as before
+  //             (option p to save then v to read for pick server!!!)
+ 
   if (stop)
     return;
 //------

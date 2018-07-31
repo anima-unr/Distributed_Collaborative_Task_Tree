@@ -173,9 +173,14 @@ int main(int argc, char *argv[]) {
             object = name_param.topic.c_str();
             // get the name of the object of corresponding node:
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
-            // set up network for corresponding node:
             ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
             ROS_INFO("Found %s at loc %f, %f, %f", obj_name.c_str(), object_pos[0], object_pos[1], object_pos[2]);
+            // set the new yaml data, i.e. loc_obj and x,y,z offsets
+            nh_.getParam((param_prefix + nodes[i] + "/loc_obj").c_str(), loc_obj);
+            nh_.getParam((param_prefix + nodes[i] + "/off_x").c_str(), off_x);
+            nh_.getParam((param_prefix + nodes[i] + "/off_y").c_str(), off_y);
+            nh_.getParam((param_prefix + nodes[i] + "/off_z").c_str(), off_z);
+            // set up network for corresponding node:
             network[i] = new task_net::TableObject_VisionManip(name_param,
                                       peers_param,
                                       children_param,
@@ -184,6 +189,10 @@ int main(int argc, char *argv[]) {
                                       obj_name.c_str(),
                                       "/right_arm_mutex",
                                       object_pos,
+                                      loc_obj,
+                                      off_x,
+                                      off_y,
+                                      off_z,
                                       false);
             // network[i] = new task_net::TableObject_VisionManip();
             // network[i] = new task_net::DummyBehavior(name_param,

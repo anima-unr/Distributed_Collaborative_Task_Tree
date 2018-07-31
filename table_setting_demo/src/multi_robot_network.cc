@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   task_net::NodeId_t parent_param;
   NodeParam nodes;
   std::string object;
-  std::string obj_name;
+  std::string obj_name, loc_obj, off_x, off_y, off_z;
   std::vector<float> neutral_object_pos;
   std::vector<float> object_pos;
 
@@ -171,6 +171,11 @@ int main(int argc, char *argv[]) {
             object = name_param.topic.c_str();
            // get the name of the object of corresponding node:
             nh_.getParam((param_prefix + nodes[i] + "/object").c_str(), obj_name);
+            // set the new yaml data, i.e. loc_obj and x,y,z offsets
+            nh_.getParam((param_prefix + nodes[i] + "/loc_obj").c_str(), loc_obj);
+            nh_.getParam((param_prefix + nodes[i] + "/off_x").c_str(), off_x);
+            nh_.getParam((param_prefix + nodes[i] + "/off_y").c_str(), off_y);
+            nh_.getParam((param_prefix + nodes[i] + "/off_z").c_str(), off_z);
             // set up network for corresponding node:
             ros::param::get(("/ObjectPositions/"+obj_name).c_str(), object_pos);
             network[i] = new task_net::TableObject(name_param,
@@ -182,6 +187,10 @@ int main(int argc, char *argv[]) {
                                       obj_name.c_str(),
                                       object_pos,
                                       neutral_object_pos,
+                                      loc_obj,
+                                      off_x,
+                                      off_y,
+                                      off_z,
                                       false);
             // network[i] = new task_net::DummyBehavior(name_param,
             //                             peers_param,

@@ -84,6 +84,10 @@ TableObject::TableObject(NodeId_t name, NodeList peers, NodeList children,
     std::string mutex_topic,
     std::vector<float> pos,
     std::vector<float> neutral_pos,
+    std::string loc_obj,
+    std::string off_x,
+    std::string off_y,
+    std::string off_z,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : Behavior(name,
       peers,
@@ -100,6 +104,17 @@ TableObject::TableObject(NodeId_t name, NodeList peers, NodeList children,
   object_pos = pos;
   neutral_object_pos = neutral_pos;
   object_id_ = "";
+
+  // set the new yaml stuff, i.e. loc_obj and x,y,z offsets
+  loc_obj_ = loc_obj;
+  off_x_ = off_x;
+  off_y_ = off_y;
+  off_z_ = off_z; 
+  // post the new yaml stuff to rosparam server...?
+  ros::param::set("/" + object_ + "/loc_obj", loc_obj_);
+  ros::param::set("/" + object_ + "/off_x", off_x_);
+  ros::param::set("/" + object_ + "/off_y", off_y_);
+  ros::param::set("/" + object_ + "/off_z", off_z_);
 
 // ROS_INFO("MADE IT HERE!!!!!!\n\n");
 

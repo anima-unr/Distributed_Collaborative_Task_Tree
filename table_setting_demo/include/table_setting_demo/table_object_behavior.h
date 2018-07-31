@@ -36,6 +36,10 @@ class TableObject : public Behavior {
     std::string mutex_topic,
     std::vector<float> pos,
     std::vector<float> neutral_pos,
+    std::string loc_obj,
+    std::string off_x,
+    std::string off_y,
+    std::string off_z,
     bool use_local_callback_queue = false,
     boost::posix_time::millisec mtime = boost::posix_time::millisec(1000)
     );
@@ -58,6 +62,10 @@ class TableObject : public Behavior {
   std::vector<float> object_pos;
   std::vector<float> neutral_object_pos;
   bool dynamic_object;
+  std::string loc_obj_;
+  std::string off_x_;
+  std::string off_y_;
+  std::string off_z_;
 
   // frame info
   std::string root_frame_;

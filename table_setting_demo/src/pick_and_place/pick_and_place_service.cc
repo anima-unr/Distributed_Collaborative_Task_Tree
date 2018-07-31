@@ -18,22 +18,22 @@ int main(int argc, char **argv) {
   // get args to set correct flags
   while ((c = getopt(argc, argv, "s:r:p:v:")) != -1) {
     switch (c) {
-      case 's':
+      case 's': // luke orig save
         save_file = optarg;
         save = true;
         pp.visionManipVer = false;
         break;
-      case 'r':
+      case 'r': // luke orig read
         read_file = optarg;
         read = true;
         pp.visionManipVer = false;
         break;
-      case 'p': // pick place saving 
+      case 'p': // train the place locations for vision manip
         save_file = optarg;
         save_place = true;
         pp.visionManipVer = true;
         break;
-      case 'v':
+      case 'v': // read in vision manip place locs
         read_file = optarg;
         pp.visionManipVer = true;
         break;
@@ -53,16 +53,20 @@ int main(int argc, char **argv) {
     // spinner.start();
 
   // make choices
+  // luke orig read
   if (read) {
     printf("Read File: %s\n", read_file.c_str());
     pp.ReadCalibration(read_file);
   } 
-  else if ( save ) { 
+  // luke orig save
+  else if ( save ) {  
     pp.CalibrateObjects();
   }
+  // train place for vision manip
   else if (save_place) {
     pp.OnlineDetectionsPlaces();    
   }
+  // read in vision manip places
   else{
     printf("Read File: %s\n", read_file.c_str());
     pp.ReadPlaces(read_file);      
@@ -71,11 +75,13 @@ int main(int argc, char **argv) {
   }
 
   // save the file if necessary
+   // luke orig save
   if (save) {
     printf("Save File: %s\n", save_file.c_str());
     pp.SaveCalibration(save_file);
   }
-  else if (save_place) {
+  // save trained vision manip places
+  else if (save_place) { 
     printf("Save File: %s\n", save_file.c_str());
     pp.SavePlaces(save_file);
   }

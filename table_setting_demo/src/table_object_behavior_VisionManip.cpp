@@ -78,15 +78,24 @@ static const char *static_object_str[] = {
   // "Right_Bread",
   // "Meat",
   // "Lettuce"
-  // DARS DEMO
-  "bird",
-  // "orange",
-  "sports_ball",
-  "clock",
-  // "bottle",
-  "scissors",
-  "cup",
-  // "bowl",
+
+  // // DARS DEMO
+  // "bird",
+  // // "orange",
+  // "sports_ball",
+  // "clock",
+  // // "bottle",
+  // "scissors",
+  // "cup",
+  // // "bowl",
+
+  // REU
+  "green_leg",
+  "blue_leg",
+  "yellow_bar",
+  "magenta_bar",
+  "colorful_top",
+  "solid_top"
 };
 
 TableObject_VisionManip::TableObject_VisionManip() : arm_group_{"right_arm"} {  ROS_ERROR("START OF TableObject_VisionManip CONSTRUCTOR");}
@@ -96,6 +105,10 @@ TableObject_VisionManip::TableObject_VisionManip(NodeId_t name, NodeList peers, 
     std::string object,
     std::string mutex_topic,
     std::vector<float> pos,
+    std::string loc_obj,
+    std::string off_x,
+    std::string off_y,
+    std::string off_z,
     bool use_local_callback_queue,
     boost::posix_time::millisec mtime) : 
 object_pos(pos), object_(object),
@@ -117,6 +130,17 @@ Behavior(name,
   object_ = object;
   // object_pos = pos;
   geometry_msgs::PoseStamped currentPose;
+
+  // set the new yaml stuff, i.e. loc_obj and x,y,z offsets
+  loc_obj_ = loc_obj;
+  off_x_ = off_x;
+  off_y_ = off_y;
+  off_z_ = off_z; 
+  // post the new yaml stuff to rosparam server...?
+  ros::param::set("/" + object_ + "/loc_obj", loc_obj_);
+  ros::param::set("/" + object_ + "/off_x", off_x_);
+  ros::param::set("/" + object_ + "/off_y", off_y_);
+  ros::param::set("/" + object_ + "/off_z", off_z_);
 
   ROS_ERROR("2 START OF TableObject_VisionManip CONSTRUCTOR");
   neutral_object_pos = {0.0, 0.0, 0.0};
