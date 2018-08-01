@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(table_task_sim)
+project(dialogue)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -10,16 +10,12 @@ project(table_task_sim)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  visualization_msgs
-  geometry_msgs
+  std_msgs
   message_generation
-  robotics_task_tree_eval
-  remote_mutex
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-#find_package(yaml-cpp REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -37,10 +33,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
 ##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
+##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET
 ##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
 ##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
+##     * add a exec_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
@@ -54,23 +50,18 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   Object.msg
-   Robot.msg
-   SimState.msg
-   ObjStatus.msg
-   Vision.msg
-   Position.msg
+   Issue.msg
+   Resolution.msg
+#   Message1.msg
+#   Message2.msg
  )
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   FILES
-   PickUpObject.srv
-   PlaceObject.srv
-   DropObject.srv
-   RemoveObject.srv
-   #Service2.srv
- )
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -82,8 +73,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   visualization_msgs
-   geometry_msgs
+   std_msgs
+   
  )
 
 ################################################
@@ -93,7 +84,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## To declare and build dynamic reconfigure parameters within this
 ## package, follow these steps:
 ## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
+##   * add a build_depend and a exec_depend tag for "dynamic_reconfigure"
 ## * In this file (CMakeLists.txt):
 ##   * add "dynamic_reconfigure" to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
@@ -111,15 +102,15 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-#  LIBRARIES table_task_sim
-  CATKIN_DEPENDS roscpp rospy visualization_msgs message_runtime robotics_task_tree_eval remote_mutex
-  DEPENDS yaml-cpp
+#  INCLUDE_DIRS include
+#  LIBRARIES dialogue
+#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  DEPENDS system_lib
 )
 
 ###########
@@ -129,13 +120,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/table_task_sim.cpp
+#   src/${PROJECT_NAME}/dialogue.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -146,9 +137,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
- add_executable(${PROJECT_NAME}_node
-  src/table_sim_node.cc
-)
+# add_executable(${PROJECT_NAME}_node src/dialogue_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,50 +147,12 @@ include_directories(
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
- add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES} yaml-cpp
- )
-
-
-# dummy multi  
-  add_executable(dummy_multi_demo
-    src/dummy_multi_network.cc
-    src/dummy_behavior_place.cc
-    src/dummy_behavior_pick.cc
-  )
-
-  add_dependencies(dummy_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-  target_link_libraries(dummy_multi_demo
-    ${catkin_LIBRARIES}
-    ${Boost_LIBRARIES}
-  )
-
-  #add_dependencies(dummy_multi_demo
-  #  table_setting_demo_generate_messages_cpp
-  #)
-
-
-
-# human multi  
-  add_executable(human_multi_demo
-    src/human_multi_network.cc
-    src/human_behavior.cpp
-    src/dummy_behavior_place.cc
-    src/dummy_behavior_pick.cc
-  )
-
-  add_dependencies(human_multi_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-  target_link_libraries(human_multi_demo
-    ${catkin_LIBRARIES}
-    ${Boost_LIBRARIES}
-  )
-
-
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -243,7 +194,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_table_task_sim.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_dialogue.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
